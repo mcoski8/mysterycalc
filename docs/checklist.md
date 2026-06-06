@@ -79,10 +79,13 @@
 - [x] Hard rule: NO cost/profit/margin on the customer sheet — enforced by `tests/odds-sheet.test.ts`
 - [ ] (Deferred) Public no-login share link — needs a share token + public-read path that still hides cost (Phase 3+)
 
-## Phase 4 — Price Lookup  *(not started)*
-- [ ] Implement the price-source interface against pokemontcg.io / TCGPlayer
-- [ ] Card search → auto-fill market value
-- [ ] Cache / rate-limit handling
+## Phase 4 — Price Lookup  *(✅ Sprint 4 BUILT + owner-verified — 2026-06-06; singles via pokemontcg.io)*
+- [x] Implement the price-source interface against pokemontcg.io / TCGPlayer — `lib/prices/*` (Decision 029)
+- [x] Card search → auto-fill market value — `CardSearch.tsx` + `Calculator.handleAddFromCard` (owner-verified)
+- [x] Cache / rate-limit handling — `app/api/prices/search/route.ts` (24h in-memory cache + per-process rate guard)
+- [x] Pure extraction unit-tested — `tests/prices.test.ts` (8); host-agnostic `<img>` for thumbnails (Decision 030)
+- [ ] (Next sprint) Sealed-product pricing via **tcgcsv** — needs a nightly sync/index into Supabase (Decision 031)
+- [ ] (Permanently manual) Graded (PSA/BGS/CGC) — no free source (not in TCGPlayer's catalog)
 
 ## Phase 5 — Launch  *(not started)*
 - [ ] Polish + accessibility pass

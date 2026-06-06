@@ -1,5 +1,11 @@
-# MASTER_HANDOFF_01 — Sessions 1+
+# MASTER_HANDOFF_01 — Sessions 1–4 (CLOSED)
 
+> **CLOSED 2026-06-06 at ~14.6KB. Covers Sessions 1–4: project kickoff + full doc system (Phase 0,
+> proposal signed off) → Phase 1 Core Calculator (pure engine + UI) → Phase 2 Save & Reuse (Supabase
+> auth + saved games + RLS, owner-verified) → Phase 3 Customer Odds Sheet (print/PDF, owner-verified).
+> All phases 1–3 DONE and owner-verified; pre-flight green throughout (41/41 tests at close).**
+> **Continue in `MASTER_HANDOFF_02.md` (Session 5+).**
+>
 > Append-only session journal. When this file passes ~15KB, close it with a summary header and start
 > `MASTER_HANDOFF_02.md` (and point `CURRENT_PHASE.md` at the new file).
 

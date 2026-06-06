@@ -12,7 +12,8 @@
 | S1 | Core Calculator | Phase 1: Core Calculator (MVP) | **Complete** (engine + UI; exit gate met) | 2026-06-05 | 2026-06-05 |
 | S2 | Save & Reuse | Phase 2: Persistence | **Complete** (built + DB live + RLS verified; owner browser click-through confirmed 2026-06-06) | 2026-06-05 | 2026-06-06 |
 | S3 | Customer Odds Sheet | Phase 3: Transparency | **Complete** (print/PDF sheet built + owner-verified; public share link deferred to Phase 3+) | 2026-06-06 | 2026-06-06 |
-| S4 | Price Lookup | Phase 4: Price data | Not Started | — | — |
+| S4 | Price Lookup | Phase 4: Price data | **Complete** (singles via pokemontcg.io; card search → market value auto-fills; owner-verified. Sealed via tcgcsv adopted but deferred to its own sprint, Decision 031) | 2026-06-06 | 2026-06-06 |
+| S4.5 | Sealed-product pricing (tcgcsv) | Phase 4: Price data | Not Started (Decision 031 — needs a nightly sync/index into Supabase) | — | — |
 | S5 | Launch | Phase 5: Launch | Not Started | — | — |
 
 ## Phase → Exit Criterion (the gate to advance)

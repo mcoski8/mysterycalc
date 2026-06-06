@@ -33,6 +33,8 @@ import {
 } from "@/lib/engine";
 import { formatUSD, formatPercent, formatNumber } from "@/lib/format";
 import { PrizePoolEditor, blankRow, type EditorRow } from "./PrizePoolEditor";
+import { CardSearch } from "./CardSearch";
+import type { PriceCandidate } from "@/lib/prices/types";
 import { SolverPanel } from "./SolverPanel";
 import { ResultsDashboard } from "./ResultsDashboard";
 import { SavedGamesBar } from "./SavedGamesBar";
@@ -183,6 +185,22 @@ export function Calculator({ userEmail }: Props) {
     setRows([...realRows, fillerRow]);
   }
 
+  // Phase 4: a vendor picked a card from the search. Add it as a new,
+  // non-filler prize row pre-filled with its name and looked-up market value
+  // (blank when the card had no price). Cost and quantity are left for the
+  // vendor — we only know the market value, never what they paid.
+  function handleAddFromCard(candidate: PriceCandidate) {
+    const row: EditorRow = {
+      ...blankRow(),
+      name: candidate.name,
+      type: "single",
+      marketValue: candidate.marketValue !== null ? String(candidate.marketValue) : "",
+      cost: "",
+      quantity: "1",
+    };
+    setRows((prev) => [...prev, row]);
+  }
+
   function handleInputChange(field: "buyIn" | "chances" | "marginPct", value: string) {
     if (field === "buyIn") setBuyIn(value);
     else if (field === "chances") setChances(value);
@@ -245,7 +263,8 @@ export function Calculator({ userEmail }: Props) {
           <CardHeader>
             <CardTitle className="text-base">2. Build the prize pool</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <CardSearch onPick={handleAddFromCard} />
             <PrizePoolEditor
               rows={rows}
               onRowsChange={setRows}

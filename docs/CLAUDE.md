@@ -74,7 +74,9 @@ break-even indicator (proposed for v1). Detail lives in `docs/modules/calculatio
 - **Tailwind CSS + shadcn/ui** — UI.
 - **Supabase (Postgres + Auth)** — login + saved games (Phase 2).
 - **Vercel** — hosting + deploy.
-- **Price lookup (Phase 4):** pokemontcg.io / TCGPlayer, behind a pluggable interface (manual entry now).
+- **Price lookup (Phase 4 — BUILT):** pokemontcg.io (singles, TCGPlayer market price) behind a pluggable
+  `PriceSource` interface; manual entry is the always-available fallback. Sealed via **tcgcsv** is adopted,
+  built in its own sprint (Decision 031); graded (PSA/BGS) has no free source and stays manual.
 - **The calculation engine is pure, framework-free TypeScript** in `lib/` — no React, no DB. Most-tested,
   best-commented part of the codebase.
 
@@ -86,7 +88,8 @@ break-even indicator (proposed for v1). Detail lives in `docs/modules/calculatio
   get the third + game-feel outputs, in-browser.
 - **Phase 2 — Save & Reuse.** Supabase auth + storage. Exit: log in, save, reopen, duplicate a game.
 - **Phase 3 — Customer Odds Sheet.** Exit: generate a printable/shareable odds sheet from a saved game.
-- **Phase 4 — Price Lookup.** Exit: search a card → market value auto-fills.
+- **Phase 4 — Price Lookup. ✅ DONE (singles).** Exit met: search a card → market value auto-fills. Sealed via
+  tcgcsv deferred to Sprint 4.5 (Decision 031).
 - **Phase 5 — Launch.** Exit: live at a real domain on Vercel, free.
 - **Future/deferred:** Live Box Breaks model; buyer "should I play / live odds" mode.
 
@@ -203,7 +206,8 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-06 (Phase 3 / Sprint 3 — Customer Odds Sheet built + owner-verified: a print/PDF
-customer-facing odds sheet derived from a saved game, with the cost/profit/margin boundary enforced by a test.
-Phase 2 fully Complete — owner browser click-through confirmed. Public odds-sheet share link deferred to
-Phase 3+ (Decision 027). Next: Phase 4 — Price Lookup.)*
+*Last updated: 2026-06-06 (Phase 4 / Sprint 4 — Price Lookup built + owner-verified: type a card name → its
+TCGPlayer market value auto-fills a new prize row, behind a pluggable price-source interface, with manual entry
+as the fallback. Singles via pokemontcg.io. Sealed-product pricing via tcgcsv is adopted (Decision 031) and
+deferred to Sprint 4.5; graded stays manual. Phases 1–4 all DONE and owner-verified. Next: Sprint 4.5 — sealed
+pricing via tcgcsv.)*

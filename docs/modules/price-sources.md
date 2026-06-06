@@ -1,10 +1,40 @@
-# Module — Price Sources (manual now, lookup later)
+# Module — Price Sources (manual fallback + automatic lookup)
 
-> **Location (planned):** `lib/prices/` (the interface) + a manual implementation now; an API implementation
-> in Phase 4.
-> **Status:** Spec only. Manual entry is the v1 reality (Decision 006); the interface exists so automatic
-> lookup drops in later without a rewrite.
-> **Related:** PokeHolder's `price-engine` / `data-sources` docs (reuse those learnings).
+> **Location:** `lib/prices/` (interface + sources), `app/api/prices/search/route.ts` (the endpoint),
+> `components/calculator/CardSearch.tsx` (the UI).
+> **Status:** ✅ **BUILT (Phase 4 / Sprint 4, 2026-06-06).** Automatic singles lookup via pokemontcg.io is
+> live and owner-verified; manual entry remains the always-available fallback. Sealed-product pricing via
+> **tcgcsv** is adopted but deferred to its own sprint (Decision 031). Graded stays manual (no free source).
+> **Related:** PokeHolder's `price-engine` / `data-sources` docs (reuse those learnings — incl. its
+> `scripts/sync-tcgcsv.mjs`, the template for our future sealed sync).
+
+---
+
+## As built (Phase 4)
+
+- **Interface (realized, Decision 029):** `PriceSource.search(query) → PriceCandidate[]` — returns *candidate
+  cards* to pick from, not a single number, because card lookup is a disambiguation problem. `lib/prices/types.ts`.
+- **Sources:** `PokemonTcgPriceSource` (free pokemontcg.io, singles + TCGPlayer market price) and
+  `ManualPriceSource` (returns `[]` → type it in). `getActivePriceSource()` picks the live one and reads the
+  optional `POKEMONTCG_API_KEY` server-side.
+- **Pure picking logic** (`lib/prices/extract.ts`, unit-tested): prefer a standard printing over scarce
+  1st-edition; prefer the sold-derived `market` field, then mid/low.
+- **Endpoint** `GET /api/prices/search?q=` — 24h in-memory cache + per-process rate guard + graceful "enter
+  manually" on any failure; the browser never calls the external API directly.
+- **UI** `CardSearch.tsx` — debounced search; picking a card adds a prize row pre-filled with name + market
+  value (cost/quantity left to the vendor). Thumbnails use a host-agnostic `<img>` (Decision 030 — the image
+  CDN migrates between `images.pokemontcg.io` and `images.scrydex.com`).
+
+## Sealed-product pricing via tcgcsv (adopted, next sprint — Decision 031)
+
+- **tcgcsv.com relays TCGPlayer's full catalog for free** (`https://tcgcsv.com/tcgplayer/3` = Pokémon;
+  `/groups`, `/{group}/products`, `/{group}/prices`). Key-less, ~daily refresh, asks for a `User-Agent`.
+- **Sealed IS included with prices** — verified live (set "Perfect Order": Booster Box $222.34, Elite Trainer
+  Box $76.31, Pokémon Center ETB $142.52, Booster Bundle $40.34, Booster Pack $5.91, … 31 sealed products).
+- **Catch:** it's a *bulk catalog, not a search API* → needs a small **nightly sync/index into Supabase**
+  before sealed can be searched (mirror PokeHolder's `scripts/sync-tcgcsv.mjs`). Then add a `TcgCsvPriceSource`
+  behind the existing interface and surface sealed results in `CardSearch`.
+- **Graded (PSA/BGS/CGC) stays manual** — not in TCGPlayer's catalog, so no free source exists.
 
 ---
 
