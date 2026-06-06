@@ -57,3 +57,19 @@ sheet, save/reuse, filler+auto-balance, game-feel outputs, sell-through [pending
 
 **Next steps.** Get owner sign-off on `PROPOSAL.md` (log resolutions as Decisions 014+), then start Phase 1
 Sprint 1 (Core Calculator): scaffold Next.js, then build + test the pure calc engine in `lib/` before any UI.
+
+---
+
+## Session 1 (cont.) — 2026-06-05 — Proposal SIGNED OFF; Phase 0 complete
+
+- Owner reviewed the proposal via a plain-text summary and resolved all 5 open items → **Decisions 014–018**:
+  (014) break-even indicator IN v1; (015) typical game size ~10–500 chances, design for tens–to–hundreds with
+  bulk filler; (016) razz KEPT in v1 (single-winner marked on odds sheet); (017) "MysteryCalc" = working
+  codename, final name pre-launch; (018) **"lock it"** — proposal signed off, no changes.
+- `docs/PROPOSAL.md` → status SIGNED OFF, §10 marked resolved. **Phase 0 (Planning & Docs) COMPLETE; Phase 1
+  (Core Calculator) cleared to begin.**
+- Docs updated: `DECISIONS_LOG.md` (014–018), `checklist.md`, `SPRINT_INDEX.md` (S0 Complete / S1 Next),
+  `s0-foundation.md`, this handoff, and `CURRENT_PHASE.md` (rewritten).
+- **Next:** Phase 1 / Sprint 1 — scaffold Next.js (latest, read bundled docs first), then build + test the pure
+  calculation engine in `lib/` BEFORE any UI, per `docs/sprints/s1-core-calculator.md` +
+  `docs/modules/calculation-engine.md`. Owner to say when to start the build.

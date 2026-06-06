@@ -1,7 +1,7 @@
 # Sprint 0 — Foundation (docs + scope)
 
 > **Phase:** 0 (Planning & Documentation)
-> **Status:** In Progress — all documentation complete; awaiting owner sign-off on `docs/PROPOSAL.md`.
+> **Status:** ✅ COMPLETE (2026-06-05) — documentation done and `docs/PROPOSAL.md` signed off by the owner. Phase 0 exit gate met.
 > **Goal:** Define the product, lock scope and the economic model, and stand up the full documentation
 > system (mirroring PokeSentry / PokeHolder) so every future session starts with full context.
 
@@ -33,8 +33,8 @@ skeleton the rest of the project runs on. Exit = the owner signs off on the prop
 | 15 | Module docs (6) | Done |
 | 16 | `README.md` + `.gitignore` | Done |
 | 17 | `git init` + initial commit | Done |
-| 18 | **Owner sign-off on PROPOSAL.md** | **Pending** ← exit gate |
-| 19 | Log sign-off resolutions as Decisions 014+ | Pending |
+| 18 | **Owner sign-off on PROPOSAL.md** | **Done** ✅ (exit gate met) |
+| 19 | Log sign-off resolutions as Decisions 014–018 | Done |
 
 ## Session Log
 
@@ -59,3 +59,10 @@ skeleton the rest of the project runs on. Exit = the owner signs off on the prop
 - **Open / next:** owner sign-off on the proposal (5 open items in §10), then Phase 1 Sprint 1 (Core Calculator).
 - **Gotchas:** keep the engine pure + test-first; don't forget filler auto-balance; Next.js will be newer than
   training (read bundled docs before app code).
+
+### Session 1 (cont.) — 2026-06-05 — Proposal signed off
+- Owner reviewed the proposal (via a plain-text summary) and answered the 5 open items → **Decisions 014–018**:
+  break-even indicator IN v1; typical game size tens–to–a–few–hundred (~10–500); razz KEPT; "MysteryCalc" is a
+  working codename; and **"lock it"** (no proposal changes).
+- `docs/PROPOSAL.md` status → **SIGNED OFF**; §10 marked resolved. **Phase 0 COMPLETE; Phase 1 cleared.**
+- Updated `DECISIONS_LOG.md` (014–018), `checklist.md`, `SPRINT_INDEX.md` (S0 Complete / S1 Next), and this file.

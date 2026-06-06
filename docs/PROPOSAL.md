@@ -1,7 +1,7 @@
 # MysteryCalc — Product & Technical Proposal
 
-> **Status:** DRAFT — awaiting owner sign-off.
-> **Purpose:** Lay out the full product and technical architecture, with rationale, so the owner can push back section by section before any code is written. **Nothing gets built until this document is signed off.** (This is the "sign-off gate" described in `PROCESS.md`, mirroring PokeHolder's `STACK_PROPOSAL.md`.)
+> **Status:** ✅ SIGNED OFF by the owner on 2026-06-05 ("lock it"). All §10 open items resolved via Decisions 014–018. Phase 0 exit gate met — Phase 1 (Core Calculator) is cleared to begin. This document is now authoritative alongside `docs/CLAUDE.md` + `docs/DECISIONS_LOG.md`.
+> **Purpose:** Lay out the full product and technical architecture, with rationale, so the owner could push back section by section before any code was written. (This was the "sign-off gate" described in `PROCESS.md`, mirroring PokeHolder's `STACK_PROPOSAL.md`.)
 > **Date:** 2026-06-05
 > **Basis:** The owner's stated objective + the discussion captured below, the converged research in `docs/research/japanese-vs-american-mystery-games.md`, and two design-review rounds with Gemini (gemini-2.5-pro).
 
@@ -144,13 +144,13 @@ This is a gambling-adjacent space. MysteryCalc positions as a **neutral game-eco
 
 A vendor can: open the app → add prize items (with market value and cost, including bulk filler) → pick a game type → set any two of {buy-in, #chances, target margin} → instantly see the third, their profit (three ways), the hit rate, the prize-tier breakdown, and the break-even point → and generate a printable customer odds sheet. Saved to their account. Deployed free at a real domain.
 
-## 10. Open Questions for the Owner (please react section-by-section)
+## 10. Open Questions for the Owner — ✅ ALL RESOLVED (2026-06-05)
 
-1. **Sell-through risk (§5.4)** — keep the break-even indicator in v1, or defer it?
-2. **Typical game size** — roughly how many prizes/chances in your games (tens? hundreds? ~1,000 sleeves)? Affects input UX (bulk tools, performance).
-3. **Razz inclusion** — keep razz in v1 (it's nearly free given the shared formula), or leave it out given its legal sensitivity in the US?
-4. **Domain/name** — is "MysteryCalc" the public name, or a working codename? (Repo stays `mysterycalc` either way.)
-5. **Anything in §1–§9 you'd change** before I treat this as signed off.
+1. **Sell-through risk (§5.4)** → **RESOLVED: include the break-even indicator in v1** (Decision 014).
+2. **Typical game size** → **RESOLVED: tens to a few hundred chances (~10–500)**; design input + bulk filler for that range (Decision 015).
+3. **Razz inclusion** → **RESOLVED: keep razz in v1**, with single-winner clearly marked on the odds sheet (Decision 016).
+4. **Domain/name** → **RESOLVED: "MysteryCalc" is a working codename**; final public name decided before launch (Decision 017).
+5. **Anything in §1–§9 to change** → **RESOLVED: no changes — owner locked the proposal as-is** (Decision 018).
 
 ---
 

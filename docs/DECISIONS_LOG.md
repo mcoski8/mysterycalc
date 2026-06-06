@@ -97,3 +97,38 @@
 **Options:** Invent a new one | Mirror the owner's existing PokeSentry/PokeHolder system
 **Choice:** Mirror it exactly — `docs/CLAUDE.md` master context, append-only `DECISIONS_LOG.md`, per-session `handoff/`, `sprints/` with task tables + session logs, `CURRENT_PHASE.md` rewritten each session, and the `session-end-prompt.md` ritual. Plus the `PROPOSAL.md` sign-off gate from PokeHolder.
 **Why:** It's proven across 120+ sessions on the owner's other projects, the owner navigates by it, and consistency means every future session starts smoothly. Documented in `PROCESS.md`.
+
+## Decision 014 — Sell-through / break-even indicator: ADOPTED for v1
+**Date:** 2026-06-05
+**Question:** Does v1 include the break-even / sell-through indicator? (Confirms the pending Decision 011.)
+**Options:** Include in v1 | Defer
+**Choice:** **Include in v1.** This confirms Decision 011 — status changes from PENDING to ADOPTED.
+**Why:** The owner confirmed. The engine shows "you break even once X of N chances sell" (`breakEvenChances = ceil(C / P)`), giving a cheap, important read on risk when a game may not fully sell out. See `docs/modules/calculation-engine.md`.
+
+## Decision 015 — Typical game size: tens to a few hundred chances
+**Date:** 2026-06-05
+**Question:** Roughly how many prizes/chances does a typical game have? (Drives input UX + performance.)
+**Options:** Tens (~10–50) | Hundreds (~50–500) | ~1,000+ | Varies widely
+**Choice:** **Tens AND hundreds (~10–500)** — owner answered "1 and 2 probably." Design the prize-pool input for this range with strong **bulk-add filler**; ~1,000 is not the primary target but the app should degrade gracefully if a vendor goes large.
+**Why:** Sets the design center for the input screen (per-item entry must be quick at the low end; bulk filler tools essential by the mid-hundreds). Avoids over-engineering for a 1,000-row case that isn't the norm, while not breaking on it.
+
+## Decision 016 — Razz / raffle retained in v1
+**Date:** 2026-06-05
+**Question:** Keep the single-winner razz/raffle format in v1 given its US legal sensitivity? (Refines Decision 002.)
+**Options:** Keep | Drop from v1
+**Choice:** **Keep it.** The customer odds sheet will clearly mark its single-winner nature.
+**Why:** It reuses the same margin formula (1 prize, N chances), so inclusion is nearly free. The legal sensitivity is the *vendor's* operating concern, not the calculator's — MysteryCalc only does math and disclosure (neutral-tool posture, Decision 012). Transparency (explicit single-winner labeling on the odds sheet) is the right response, not omission.
+
+## Decision 017 — "MysteryCalc" is a working codename; final public name deferred
+**Date:** 2026-06-05
+**Question:** Is "MysteryCalc" the final public name?
+**Options:** Final | Working codename (decide later) | A different name
+**Choice:** **Working codename.** Keep building as "MysteryCalc"; pick the final public name before launch (Phase 5). The repo folder stays `mysterycalc` regardless.
+**Why:** No need to lock branding now; deferring avoids rework if a better name emerges. UI copy should keep the product name in one place (easy to swap later).
+
+## Decision 018 — PROPOSAL signed off; Phase 0 complete
+**Date:** 2026-06-05
+**Question:** Is `docs/PROPOSAL.md` approved, and are there any remaining changes before it's locked?
+**Options:** Lock as-is | Request changes
+**Choice:** **Lock as-is.** Owner said "lock it." All five §10 open items resolved (Decisions 014–017 + no further changes). `docs/PROPOSAL.md` status → SIGNED OFF. **Phase 0 (Planning & Docs) exit gate is met; Phase 1 (Core Calculator) is cleared to begin.**
+**Why:** The proposal captured the full product + technical architecture and the owner reviewed it (via the plain-text summary) and approved it with no changes. Per the project's phase discipline (Decision 013 / `PROCESS.md`), application code may now begin — starting with scaffolding the Next.js app and building the pure calculation engine in `lib/` first, per `docs/sprints/s1-core-calculator.md`.

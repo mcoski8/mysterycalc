@@ -25,8 +25,10 @@
 - [x] Write module docs: calculation-engine, prize-pool, game-types, odds-sheet, price-sources, database-schema
 - [x] Write `README.md` + `.gitignore`
 - [x] `git init` + initial commit
-- [ ] **Owner sign-off on `docs/PROPOSAL.md`** (resolve the 5 open items in §10) ← PHASE 0 EXIT GATE
-- [ ] Log sign-off resolutions as Decisions 014+
+- [x] **Owner sign-off on `docs/PROPOSAL.md`** (5 open items resolved) ← PHASE 0 EXIT GATE ✅ 2026-06-05
+- [x] Log sign-off resolutions as Decisions 014–018
+
+**Phase 0 COMPLETE (2026-06-05).** Phase 1 cleared to begin.
 
 ---
 

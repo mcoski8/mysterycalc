@@ -8,8 +8,8 @@
 
 | Sprint | Name | Phase | Status | Started | Completed |
 |--------|------|-------|--------|---------|-----------|
-| S0 | Foundation (docs + scope) | Phase 0: Planning & Docs | **In Progress** (docs done; awaiting proposal sign-off) | 2026-06-05 | — |
-| S1 | Core Calculator | Phase 1: Core Calculator (MVP) | Not Started | — | — |
+| S0 | Foundation (docs + scope) | Phase 0: Planning & Docs | **Complete** (proposal signed off) | 2026-06-05 | 2026-06-05 |
+| S1 | Core Calculator | Phase 1: Core Calculator (MVP) | **Next / Ready** | — | — |
 | S2 | Save & Reuse | Phase 2: Persistence | Not Started | — | — |
 | S3 | Customer Odds Sheet | Phase 3: Transparency | Not Started | — | — |
 | S4 | Price Lookup | Phase 4: Price data | Not Started | — | — |
