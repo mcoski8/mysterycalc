@@ -1,12 +1,13 @@
-# Current: Phase 0 COMPLETE ✅ — proposal SIGNED OFF. **Phase 1 (Core Calculator) is next.**
+# Current: Phase 1 / Sprint 1 (Core Calculator) ✅ COMPLETE — **Phase 2 (Save & Reuse) is next.**
 
-> Updated: 2026-06-05 (proposal sign-off)
-> Status: **Phase 0 (Planning & Docs) COMPLETE.** `docs/PROPOSAL.md` signed off by the owner ("lock it"),
-> all open items resolved (Decisions 001–018). **Phase 1 (Core Calculator) is cleared to begin — no app code
-> written yet.**
-> Active handoff: **`docs/handoff/MASTER_HANDOFF_01.md`**
-> Anchoring docs: `docs/PROPOSAL.md` (signed off), `docs/CLAUDE.md` (master context),
-> `docs/sprints/s1-core-calculator.md` (next sprint), `docs/modules/calculation-engine.md` (the math spec).
+> Updated: 2026-06-05 (end of Session 2 — Sprint 1 build)
+> Status: **Phase 1 / Sprint 1 (Core Calculator) COMPLETE.** The pure calculation engine and the full
+> calculator UI are built, tested, and verified. **Phase 1 exit criterion is MET** (a vendor can build a pool,
+> fix any two of {price, #chances, margin}, and get the third plus the game-feel outputs, in the browser).
+> Active handoff: **`docs/handoff/MASTER_HANDOFF_01.md`** (Session 2 appended; ~9KB, no roll yet).
+> Anchoring docs: `docs/CLAUDE.md` (master context), `docs/sprints/s1-core-calculator.md` (just-finished sprint),
+> `docs/modules/calculation-engine.md` (the math, now implemented), `docs/PROPOSAL.md` (signed off),
+> `docs/DECISIONS_LOG.md` (001–022).
 
 ---
 
@@ -15,85 +16,99 @@
 A free web app for **vendors** to **design and price mystery games** (oripa, mystery boxes, walls of sleeves,
 prize wheels, kuji, razzes — the finite-pool family). Enter prizes (market value AND your cost), pick a game
 type, set any two of {buy-in price, number of chances, target margin}, and it solves the third — then shows
-profit three ways, hit rate, prize-tier breakdown, and break-even. Plus a printable customer odds sheet.
-Built on Next.js + Supabase + Vercel (same stack as PokeHolder).
+profit three ways, hit rate, prize-tier breakdown, and break-even. Plus (later) a printable customer odds
+sheet and saved games. Stack: Next.js 16 + Supabase + Vercel (same as PokeHolder).
 
-## What was completed (Phase 0)
+## What was completed (Session 2 — Sprint 1)
 
-- Full documentation system built (mirrors PokeSentry/PokeHolder): `PROCESS.md`, root `CLAUDE.md`+`AGENTS.md`,
-  `docs/CLAUDE.md`, `docs/PROPOSAL.md`, `DECISIONS_LOG.md`, `CURRENT_PHASE.md`, `checklist.md`,
-  `session-end-prompt.md`, sprint index + S0/S1, handoff 01, the JP-vs-US research, and 6 module specs.
-- Product + scope locked with the owner and the economic model validated with Gemini → **Decisions 001–018**.
-- **`docs/PROPOSAL.md` SIGNED OFF** (Decision 018) — Phase 0 exit gate met.
+- **Scaffold + tooling:** Next.js **16.2.7** (Turbopack default), React 19.2.4, Tailwind v4, shadcn/ui
+  (Nova/radix), **Vitest 3.2.6**. Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:watch`.
+- **Pure calculation engine** in `lib/` (no React/DB), built test-first:
+  - `lib/types.ts`, `lib/errors.ts`, `lib/games/game-types.ts`, `lib/pool/pool.ts`, `lib/engine/engine.ts`,
+    `lib/engine/index.ts` (barrel → `@/lib/engine`).
+  - Solve-for {N, P, m}; filler auto-balance (Σqty=N); razz; cut three ways; hit rate + chase/win/dud tiers +
+    volatility; break-even; per-prize odds; loud `EngineError` edge guards.
+  - **`tests/engine.test.ts` — 31 tests, all passing.** The worked example reproduces exactly.
+- **Calculator UI** (`app/` + `components/calculator/`): game picker + solve-for toggle, prize-pool editor
+  with one-click "Balance filler to N", and a results dashboard (cut three ways with a lead toggle, hit rate,
+  stacked tier bar, volatility badge, per-prize odds table). Seeded with the worked example.
+- **All pre-flight green:** typecheck ✅, lint ✅, 31/31 tests ✅, build ✅. SSR smoke test confirms the live
+  page shows margin 41% / profit $1,465 / break-even 27 / hit rate 5% / volatility high.
+- **Decisions 020–022 logged** (stack + Vitest advisory call; V-held-fixed solve; razz modeling).
 
 ## In progress
 
-- Nothing actively coding. Awaiting the owner's go to start the Phase 1 build.
+- Nothing actively coding. Sprint 1 is closed.
 
 ## Not started yet
 
-- All application code. The Next.js project is not scaffolded; `lib/`, `app/`, `components/`, `supabase/`,
-  `tests/` do not exist.
+- **Phase 2 — Save & Reuse:** Supabase project + auth, schema/migration for saved games, save/load/rename/
+  duplicate/delete, row-level security. (`docs/modules/database-schema.md`.)
+- Phase 3 (odds sheet), Phase 4 (price lookup), Phase 5 (launch).
 
 ## Blockers / open items
 
-- **None blocking.** All proposal questions resolved. The only gate is the owner saying "start building"
-  (a big step — scaffolding + engine), which is why the build hasn't auto-started.
-
-## Immediate next actions (Phase 1 / Sprint 1 — Core Calculator)
-
-1. **Scaffold** the Next.js (App Router) + TypeScript project — Next.js is the **latest version, newer than
-   training**; read `node_modules/next/dist/docs/` before writing app code. Add Tailwind + shadcn/ui, ESLint,
-   typecheck, and a test runner (Vitest).
-2. **Build the pure calculation engine in `lib/` FIRST, with tests** (engine before UI) — per
-   `docs/modules/calculation-engine.md`: pool value/cost, solve-for {N,P,m}, filler auto-balance (Σqty=N),
-   razz special case, cut three ways, hit rate + tier buckets + volatility, break-even, per-prize odds, and
-   loud edge-case guards. The worked example must reproduce exactly.
-3. **Then build the UI** on the green engine: prize-pool input (with bulk filler), game-type picker, solver
-   panel (fix two → show third), results dashboard.
-4. Keep `docs/sprints/s1-core-calculator.md` task table + session log updated as work lands.
+- **None blocking.** Soft follow-up: the owner hasn't yet clicked through the UI in a real browser (it's been
+  verified programmatically via SSR). A human pass would be worthwhile before Phase 2.
 
 ## Gotchas / lessons
 
-- Build the engine **pure and test-first** — it's the product.
-- Don't forget **Σ(quantities)=N filler auto-balance** (Decision 009) and the **game-feel outputs** (Decision 010).
-- Next.js will be **newer than training** — read the bundled docs first (`AGENTS.md` rule 5).
-- Keep cost/profit numbers OFF the customer odds sheet (market value + odds only).
+- **Vitest UI advisory (GHSA-5xrq-8626-4rwp)** affects only `vitest --ui`, which we never run — staying on
+  Vitest 3 is deliberate (Decision 020). Don't force a breaking v4 bump to silence `npm audit`.
+- **Solve-for-N holds pool value V fixed (Decision 021):** the solved N can differ from the listed prize
+  count; the engine WARNS ("add filler to reach N"). Intended — it matches the worked example.
+- **Razz (Decision 022):** the single winner takes the entire listed pool; N−1 implicit $0 spots drive the
+  feel stats. Switching the seeded pool to razz fires a (correct) "razz has no filler" warning.
+- Next.js 16 is newer than training: Turbopack is default, `next lint` is removed (`lint` = `eslint .`),
+  request APIs are async. Read `node_modules/next/dist/docs/` before app code.
+
+## Immediate next actions (Phase 2 / Sprint 2 — Save & Reuse)
+
+1. Stand up a **Supabase project** for MysteryCalc (clean — the Supabase migration-drift note in memory is a
+   different project). Wire env vars locally and on Vercel.
+2. Add **auth** (login) while keeping the Phase 1 calculator fully usable logged-out.
+3. Design the **schema + migration** for saved games + their prize items (`docs/modules/database-schema.md`),
+   with **row-level security** so a user sees only their own games.
+4. Build **save / load / rename / duplicate / delete** of game setups on top of the existing calculator state.
+5. Keep `docs/sprints/` (open an `s2-*.md`), `checklist.md`, and `SPRINT_INDEX.md` updated as work lands.
 
 ## Resume prompt for next session
 
 ```
-MysteryCalc — Phase 0 COMPLETE (proposal SIGNED OFF, Decision 018). Phase 1 (Core Calculator) is cleared to
-begin. NO application code exists yet — the Next.js project is not scaffolded.
+MysteryCalc — Phase 1 / Sprint 1 (Core Calculator) is COMPLETE and committed. The Next.js 16 app is
+scaffolded; the PURE calculation engine (lib/) is built and covered by 31 passing Vitest tests; and the full
+calculator UI is shipped and SSR-verified to reproduce the worked example exactly (margin 41%, profit $1,465,
+break-even 27, hit rate 5%, volatility high). All pre-flight checks pass (typecheck/lint/test/build). Phase 1
+exit gate is MET.
 
 WHAT MYSTERYCALC IS: a free Next.js web app for VENDORS to design & price mystery games (oripa, mystery boxes,
-walls of sleeves, prize wheels, kuji, razzes — the "finite-pool" family). Enter prizes (market value AND cost)
-→ pick a game type → set any two of {buy-in price P, # chances N, target margin m} → it solves the third →
-shows profit three ways (% / $ / pool-multiple), hit rate, prize-tier breakdown, break-even. Plus a printable
-customer odds sheet, and saved/reusable games. Stack: Next.js + TS + Tailwind/shadcn + Supabase + Vercel
-(mirrors PokeHolder). Scope + all decisions locked: docs/DECISIONS_LOG.md (001–018).
+walls of sleeves, prize wheels, kuji, razz — the finite-pool family). Enter prizes (market value AND cost) →
+pick a game type → set any two of {buy-in P, # chances N, target margin m} → solve the third → see profit
+three ways (% / $ / pool-multiple), hit rate, prize-tier breakdown, break-even. Stack: Next.js 16 + TS +
+Tailwind v4 + shadcn + (Phase 2) Supabase + Vercel.
 
-CORE MATH (docs/modules/calculation-engine.md): V=pool market value, C=pool cost, N=#chances, P=buy-in.
-R=N×P, margin m=1−V/(N×P), profit=R−C, solve for any one of {N,P,m}. CRITICAL: in every-chance-wins games
-Σ(prize quantities)=N → vendor defines FILLER, tool auto-balances (D-009). Razz = special case (1 prize, N
-chances). Outputs go beyond margin: hit rate (% chances ≥ P), prize-tier buckets, volatility, break-even
-(ceil(C/P)) (D-010, D-014). Typical game size ~10–500 chances (D-015) → input UX needs strong bulk-filler.
+KEY CODE: engine in lib/engine/engine.ts (+ barrel lib/engine/index.ts → @/lib/engine), pool helpers in
+lib/pool/pool.ts, game registry lib/games/game-types.ts, types lib/types.ts, errors lib/errors.ts; tests in
+tests/engine.test.ts. UI in components/calculator/{Calculator,SolverPanel,PrizePoolEditor,ResultsDashboard}.tsx,
+page app/page.tsx. Scripts: npm run dev/build/typecheck/lint/test.
 
-THIS SESSION = Phase 1 / Sprint 1 (Core Calculator), per docs/sprints/s1-core-calculator.md:
-1) Scaffold Next.js (App Router) + TS — LATEST Next.js, NEWER THAN TRAINING; read node_modules/next/dist/docs/
-   before app code. Add Tailwind + shadcn/ui, ESLint, typecheck, Vitest.
-2) Build the PURE calc engine in lib/ FIRST, WITH TESTS (engine before UI). Worked example must reproduce
-   exactly: 1 slab $600 + 4 ETB $50 + 95 filler $4 = V $1,180, N 100, P $20 → margin 41%; 35% at $20 → ~91.
-3) Then the UI: prize-pool input (bulk filler), game-type picker, solver panel (fix two → show third), results
-   dashboard. Keep cost/profit OFF the customer odds sheet.
+THIS SESSION = Phase 2 / Sprint 2 (Save & Reuse): stand up a CLEAN Supabase project, add login (keep the
+Phase 1 calculator usable logged-out), design the saved-games schema + migration with row-level security
+(docs/modules/database-schema.md), then build save/load/rename/duplicate/delete. Don't write later-phase
+(odds-sheet / price-lookup) code yet.
 
-READ AT SESSION OPEN: docs/CLAUDE.md, docs/CURRENT_PHASE.md, docs/PROPOSAL.md (signed off),
-docs/sprints/s1-core-calculator.md, docs/modules/calculation-engine.md (+ prize-pool, game-types as needed).
-Follow AGENTS.md (esp. the code-comment standard for technical + semi-non-technical readers; append-only doc
-discipline; stay in-phase).
+GOTCHAS: Vitest UI advisory affects only `vitest --ui` (we never run it) — stay on Vitest 3 (Decision 020).
+Solve-for-N holds pool value V fixed and WARNS if N ≠ prize count (Decision 021). Razz = one winner takes the
+whole listed pool + N−1 implicit $0 spots (Decision 022). Next.js 16 is newer than training — Turbopack is
+default, `next lint` is gone, request APIs are async; read node_modules/next/dist/docs/ before app code.
 
-AT SESSION CLOSE: follow docs/session-end-prompt.md line by line; rewrite this file; append to the handoff
-(roll to _02 if >15KB); end with the verbatim resume prompt.
+READ AT SESSION OPEN: docs/CLAUDE.md, docs/CURRENT_PHASE.md, docs/sprints/SPRINT_INDEX.md, the new s2 sprint
+file, docs/modules/database-schema.md, and DECISIONS_LOG.md (001–022). Follow AGENTS.md (comment standard for
+technical + semi-non-technical readers; append-only docs; stay in-phase).
+
+AT SESSION CLOSE: follow docs/session-end-prompt.md line by line; update the sprint file + checklist +
+SPRINT_INDEX; append DECISIONS + handoff; rewrite this file; commit + push to origin/main (Decision 019,
+pre-authorized); end with the verbatim resume prompt.
 ```
 
 ---

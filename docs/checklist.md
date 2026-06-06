@@ -32,34 +32,34 @@
 
 ---
 
-## Phase 1 — Core Calculator (MVP)  *(not started — begins after sign-off)*
+## Phase 1 — Core Calculator (MVP)  *(✅ Sprint 1 COMPLETE — 2026-06-05)*
 
 ### Sprint 1: Core Calculator
 **Scaffold**
-- [ ] Scaffold Next.js (App Router) + TypeScript project (latest Next.js — read bundled docs first)
-- [ ] Set up Tailwind + shadcn/ui
-- [ ] Configure ESLint + typecheck + a test runner (Vitest), and `npm` scripts
+- [x] Scaffold Next.js (App Router) + TypeScript project (Next 16.2.7 — read bundled v16 docs first)
+- [x] Set up Tailwind + shadcn/ui (Tailwind v4, shadcn Nova/radix)
+- [x] Configure ESLint + typecheck + a test runner (Vitest 3), and `npm` scripts
 
 **The calculation engine (pure TS in `lib/` — build and test BEFORE any UI)**
-- [ ] Types: prize item (name, type, market value, cost, quantity, isFiller), game config, results
-- [ ] Pool value `V` = Σ(market value × quantity); pool cost = Σ(cost × quantity)
-- [ ] Solve-for: `N` from (V,P,m); `P` from (V,N,m); `m` from (V,N,P)
-- [ ] Filler auto-balance so Σ(quantities) = N for every-chance-wins games
-- [ ] Razz special case (1 prize, N chances)
-- [ ] Cut three ways: margin %, profit $ (uses cost), pool multiple
-- [ ] Game-feel outputs: hit rate (% chances ≥ buy-in), prize-tier buckets, volatility
-- [ ] Break-even / sell-through indicator (pending Decision 011 confirmation)
-- [ ] Per-prize odds (quantity ÷ N) for the future odds sheet
-- [ ] Edge-case guards (margin ≥ 1, N ≤ 0, empty pool) with clear errors
-- [ ] **Engine unit tests** covering every formula + the worked example + edge cases
+- [x] Types: prize item (name, type, market value, cost, quantity, isFiller), game config, results → `lib/types.ts`
+- [x] Pool value `V` = Σ(market value × quantity); pool cost = Σ(cost × quantity) → `lib/pool/pool.ts`
+- [x] Solve-for: `N` from (V,P,m); `P` from (V,N,m); `m` from (V,N,P) → `lib/engine/engine.ts`
+- [x] Filler auto-balance so Σ(quantities) = N for every-chance-wins games → `balanceFiller`
+- [x] Razz special case (1 prize, N chances)
+- [x] Cut three ways: margin %, profit $ (uses cost), pool multiple
+- [x] Game-feel outputs: hit rate (% chances ≥ buy-in), prize-tier buckets, volatility
+- [x] Break-even / sell-through indicator (Decision 014 — adopted) → `breakEven`
+- [x] Per-prize odds (quantity ÷ N) for the future odds sheet
+- [x] Edge-case guards (margin ≥ 1, N ≤ 0, empty pool) with clear errors → `lib/errors.ts` / `EngineError`
+- [x] **Engine unit tests** covering every formula + the worked example + edge cases → `tests/engine.test.ts` (31)
 
 **The UI (after the engine is green)**
-- [ ] Prize-pool input (add/edit/remove items; bulk-add filler)
-- [ ] Game-type picker (finite-pool family) with per-type defaults
-- [ ] Solver panel: pick which two of {price, #chances, margin} to fix; show the third
-- [ ] Results dashboard: cut three ways + hit rate + tier breakdown + volatility + break-even
-- [ ] Sensible empty/loading/error states; mobile-friendly layout
-- [ ] Manual QA against the worked example from `docs/CLAUDE.md`
+- [x] Prize-pool input (add/edit/remove items; bulk-add filler) → `components/calculator/PrizePoolEditor.tsx`
+- [x] Game-type picker (finite-pool family) with per-type defaults → `SolverPanel.tsx`
+- [x] Solver panel: pick which two of {price, #chances, margin} to fix; show the third → `SolverPanel.tsx`
+- [x] Results dashboard: cut three ways + hit rate + tier breakdown + volatility + break-even → `ResultsDashboard.tsx`
+- [x] Sensible empty/loading/error states; mobile-friendly layout → `Calculator.tsx` (incomplete/error/ok outcome)
+- [x] Manual QA against the worked example from `docs/CLAUDE.md` (SSR-verified; owner click-through pending)
 
 ---
 

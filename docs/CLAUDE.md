@@ -203,4 +203,4 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-05 (Phase 0 — initial documentation build-out).*
+*Last updated: 2026-06-05 (Phase 1 / Sprint 1 — Core Calculator built: pure engine + 31 tests + calculator UI; exit gate met).*

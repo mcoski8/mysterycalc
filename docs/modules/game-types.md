@@ -1,7 +1,8 @@
 # Module — Game Types (the finite-pool family)
 
-> **Location (planned):** `lib/games/` (per-type config + defaults).
-> **Status:** Spec only (Phase 1 / Sprint 1).
+> **Location:** `lib/games/game-types.ts` (per-type config + defaults; `GAME_TYPES`, `GAME_TYPE_LIST`, `gameMeta`).
+> **Status:** ✅ **Implemented** (Sprint 1, 2026-06-05). All 7 types ship with `chanceWord`/`chanceWordPlural`,
+> `everyChanceWins`/`allowsFiller`/`singleWinner` flags, and a `defaultMargin`.
 > **Related:** `docs/modules/calculation-engine.md`, `docs/modules/prize-pool.md`,
 > `docs/research/japanese-vs-american-mystery-games.md` (full background on each game).
 

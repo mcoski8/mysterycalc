@@ -139,3 +139,24 @@
 **Options:** Local only | Push on request | Commit + push to origin/main every session (auto)
 **Choice:** Remote = **`https://github.com/mcoski8/mysterycalc`** (origin/main). **Commit + push to origin/main is MANDATORY at every session close, pre-authorized — attempt the push without asking.**
 **Why:** The owner enabled this to match their other projects (PokeSentry, PokeHolder, TrendRadar, Taiwanese). It guarantees nothing is lost between sessions and the remote is always current. Encoded in `docs/session-end-prompt.md` (Pre-Flight → Always → step 3). A sandbox/network block on a push is not the owner reconsidering — report and continue.
+
+## Decision 020 — Realized Phase 1 tech stack + the Vitest UI advisory call
+**Date:** 2026-06-05
+**Question:** What exact tooling/versions does the Sprint 1 build land on, and how do we handle the Vitest security advisory?
+**Options:** (a) Pin the versions create-next-app + shadcn chose and stay on Vitest 3 | (b) Force-upgrade to Vitest 4 to clear the audit warning
+**Choice:** **(a).** Stack: **Next.js 16.2.7** (Turbopack is the default build/dev engine in 16; `next lint` is removed → `lint` script is `eslint .`), **React 19.2.4**, **Tailwind v4** (CSS-config), **shadcn/ui** (Nova preset, radix base), **Vitest 3.2.6**. Stay on Vitest 3.
+**Why:** This is the realized form of Decision 003 (the PokeHolder-style stack), now version-pinned. The npm-audit "critical" (GHSA-5xrq-8626-4rwp) affects **only** the Vitest **UI server** (`vitest --ui`), which we never run — our scripts use `vitest run`. It is not a runtime/production exposure. The fix is a breaking Vitest 4 bump that isn't worth the churn for a feature we don't use. Revisit only if we ever add `vitest --ui`. Implements: Phase 1 scaffold (see `s1-core-calculator.md`).
+
+## Decision 021 — Solve-for treats pool value V as a fixed constant (no silent filler rebalance)
+**Date:** 2026-06-05
+**Question:** When the engine solves for the number of chances N, should it recompute filler (which would change V, which would change the N it needs — a circular loop), or hold V fixed?
+**Options:** (a) Hold V fixed at the current pool's value; warn if the solved N ≠ the listed prize count | (b) Iteratively rebalance filler to the solved N
+**Choice:** **(a).** `solveGame` takes V = Σ(marketValue × qty) of the pool exactly as listed and treats it as a constant while solving. If the solved N differs from the listed prize count (every-chance-wins games), it emits a **warning** ("add filler to reach N for accurate odds"), it does not silently rebalance.
+**Why:** It matches the official worked example exactly — V=$1,180 stays $1,180 while N is solved to 91, even though the seeded pool holds 100 prizes. Option (b) is circular (adding filler raises V, which raises the N needed, …) and would diverge from the documented acceptance test. Honest warnings beat a hidden feedback loop. The UI's "Balance filler to N" button is the explicit, user-driven way to make prize count = N. See `docs/modules/calculation-engine.md`.
+
+## Decision 022 — Razz modeling: one winner takes the whole listed pool; losers are implicit $0 spots
+**Date:** 2026-06-05
+**Question:** For razz (single-winner), how is the prize and the player experience modeled when the vendor may list more than one item?
+**Options:** (a) The single winner takes the ENTIRE listed pool (V = Σ of all listed items); the other N−1 spots are implicit "no-prize" $0 chances | (b) Require razz pools to contain exactly one item
+**Choice:** **(a).** For razz the engine sets the winning value = `poolValue(items)` (the whole listed pool, so a vendor can bundle "slab + ETB" as one grand prize) with count 1, and synthesizes **N−1 implicit $0 "No prize" spots** for hit-rate, tier, volatility, and odds. A "No prize / (N−1)/N" line appears in the per-prize odds. The margin formula `m = 1 − V/(N×P)` is unchanged.
+**Why:** It keeps razz on the same single math model (Decision 002) while supporting real-world bundled raffle prizes, and it makes the single-winner structure explicit on the (future) odds sheet (Decision 016's transparency requirement). The implicit $0 spots are what make razz correctly read as 1% hit rate / high volatility / "1 in N" odds without storing dummy pool rows.

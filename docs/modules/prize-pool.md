@@ -1,7 +1,8 @@
 # Module — Prize Pool (inventory input)
 
-> **Location (planned):** `lib/pool/` (data model + helpers) + `app/` UI for entry.
-> **Status:** Spec only (Phase 1 / Sprint 1).
+> **Location:** `lib/pool/pool.ts` (data model + helpers) + `components/calculator/PrizePoolEditor.tsx` (UI).
+> **Status:** ✅ **Implemented** (Sprint 1, 2026-06-05). `balanceFiller` is pure and replaces stale filler
+> rather than stacking it; the UI exposes it as a one-click "Balance filler to N" button.
 > **Related:** `docs/modules/calculation-engine.md` (consumes the pool), `docs/modules/game-types.md`.
 
 ---

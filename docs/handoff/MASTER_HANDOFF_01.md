@@ -73,3 +73,48 @@ Sprint 1 (Core Calculator): scaffold Next.js, then build + test the pure calc en
 - **Next:** Phase 1 / Sprint 1 — scaffold Next.js (latest, read bundled docs first), then build + test the pure
   calculation engine in `lib/` BEFORE any UI, per `docs/sprints/s1-core-calculator.md` +
   `docs/modules/calculation-engine.md`. Owner to say when to start the build.
+
+---
+
+## Session 2 — 2026-06-05 — Phase 1 / Sprint 1 BUILT: engine, tests, and calculator UI
+
+**Summary.** Built the entire Core Calculator (Sprint 1) in one session: scaffolded the app, wrote the pure
+calculation engine **test-first**, then the full interactive UI. Everything is green and the official worked
+example reproduces **exactly** in the running app. **Phase 1 exit criterion is MET.**
+
+**Pre-flight (all pass):** `npm run typecheck` ✅ · `npm run lint` ✅ · `npm test` → **31/31** ✅ ·
+`npm run build` ✅. SSR smoke test of the seeded page confirms: **margin 41%**, profit **$1,465**, revenue
+**$2,000**, avg value **$11.80**, pool multiple **1.69×**, hit rate **5%**, break-even **27 sleeves**,
+volatility **high** — i.e. the `docs/CLAUDE.md` worked example, end to end.
+
+**Stack realized (Decision 020).** Next.js **16.2.7** (Turbopack default; `next lint` removed → `lint` is
+`eslint .`; async request APIs), React **19.2.4**, Tailwind **v4**, shadcn/ui (Nova/radix), Vitest **3.2.6**.
+Read the bundled `node_modules/next/dist/docs/.../version-16.md` upgrade guide before writing app code, per
+`AGENTS.md` rule 5. Scaffolded in `/tmp` and merged into the repo to preserve the existing docs / `AGENTS.md`
+/ `.gitignore`.
+
+**Files created.**
+- *Engine (pure TS, no React/DB):* `lib/types.ts`, `lib/errors.ts` (`EngineError` + codes), `lib/games/game-types.ts`
+  (7-type registry), `lib/pool/pool.ts` (totals, `validatePool`, `fillerNeeded`, `balanceFiller`),
+  `lib/engine/engine.ts` (`marginFor`/`priceFor`/`chancesFor`, `breakEven`, game-feel, `solveGame`),
+  `lib/engine/index.ts` (barrel → `@/lib/engine`). Tests: `tests/engine.test.ts` (31).
+- *UI:* `components/calculator/{Calculator,SolverPanel,PrizePoolEditor,ResultsDashboard}.tsx`,
+  `app/page.tsx` (server shell + disclaimer), `app/layout.tsx` (metadata), `lib/format.ts`, `lib/brand.ts`.
+- *Config:* `package.json` (scripts), `vitest.config.ts`, `components.json`, `components/ui/*` (shadcn).
+
+**Decisions logged:** D-020 (stack + Vitest-UI advisory: stay on v3, the advisory only hits `vitest --ui`
+which we never run), D-021 (solve-for holds pool value V fixed; warns instead of silently rebalancing filler —
+matches the worked example), D-022 (razz = one winner takes the whole listed pool + N−1 implicit $0 spots).
+
+**Open / next (Phase 2 — Save & Reuse):** Supabase auth + storage so a vendor can save, reopen, and
+duplicate games (the Phase 1 calculator stays login-free). See `docs/modules/database-schema.md`. NB: the
+PokeDrop/PokeHolder note about Supabase migration-history drift is a *different* project — start MysteryCalc's
+Supabase clean.
+
+**Landmines for next session:**
+- **Vitest UI advisory (GHSA-5xrq-8626-4rwp):** dev-only, `vitest --ui`-only; not in our scripts. Don't
+  "fix" it with a breaking v4 bump unless we add the UI.
+- **Solve-for-N can yield N ≠ listed prize count** → engine WARNS (intended, per D-021). Not a bug.
+- **Razz + multi-item pool:** winner takes ALL items; switching the seeded pool to razz fires a "razz has no
+  filler" warning until the vendor trims to the real single prize (per D-022).
+- Owner has not yet clicked through the UI in a browser (verified via SSR only) — worth a human pass.

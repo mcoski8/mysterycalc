@@ -1,7 +1,9 @@
 # Module — Calculation Engine
 
-> **Location (planned):** `lib/engine/` (pure TypeScript — no React, no database).
-> **Status:** Spec only (Phase 1 / Sprint 1 will build it).
+> **Location:** `lib/engine/engine.ts` (+ `lib/engine/index.ts` barrel; pure TypeScript — no React, no DB).
+> **Status:** ✅ **Implemented** (Sprint 1, 2026-06-05). Tests: `tests/engine.test.ts` (31 passing).
+> The public shape below was realized with one addition: `GameConfig` carries an explicit `solveFor` field so
+> there's no guessing which knob to compute. See Decisions 021 (V held fixed) and 022 (razz modeling).
 > **Read this before touching any math.** This is the product. Everything else is a wrapper around it.
 
 ---
