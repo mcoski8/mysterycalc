@@ -10,7 +10,7 @@
 |--------|------|-------|--------|---------|-----------|
 | S0 | Foundation (docs + scope) | Phase 0: Planning & Docs | **Complete** (proposal signed off) | 2026-06-05 | 2026-06-05 |
 | S1 | Core Calculator | Phase 1: Core Calculator (MVP) | **Complete** (engine + UI; exit gate met) | 2026-06-05 | 2026-06-05 |
-| S2 | Save & Reuse | Phase 2: Persistence | **Next / Ready** | — | — |
+| S2 | Save & Reuse | Phase 2: Persistence | **Built + DB live + RLS verified** (owner browser click-through pending) | 2026-06-05 | 2026-06-05 |
 | S3 | Customer Odds Sheet | Phase 3: Transparency | Not Started | — | — |
 | S4 | Price Lookup | Phase 4: Price data | Not Started | — | — |
 | S5 | Launch | Phase 5: Launch | Not Started | — | — |

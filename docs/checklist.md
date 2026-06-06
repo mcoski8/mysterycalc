@@ -63,11 +63,13 @@
 
 ---
 
-## Phase 2 — Save & Reuse  *(not started)*
-- [ ] Supabase project + auth (login)
-- [ ] Schema + migration for saved games & prize items (see `docs/modules/database-schema.md`)
-- [ ] Save / load / rename / duplicate / delete game setups
-- [ ] Row-level security (a user sees only their own games)
+## Phase 2 — Save & Reuse  *(✅ Sprint 2 built + DB live + RLS verified — 2026-06-05; owner browser click-through pending)*
+- [x] Supabase project + auth (login) — project `txrlpwvmawwfuuzedfbw`; email+password (Decision 023)
+- [x] Schema + migration for saved games & prize items (see `docs/modules/database-schema.md`) — applied via `db push`
+- [x] Save / load / rename / duplicate / delete game setups — `lib/saved-games/*` + `SavedGamesBar.tsx`
+- [x] Row-level security (a user sees only their own games) — **verified end-to-end against the live DB**
+- [ ] Owner browser click-through: sign up → save → reopen → duplicate (final Phase 2 gate confirmation)
+- [ ] (Optional) disable email confirmation in the Supabase dashboard for instant signup
 
 ## Phase 3 — Customer Odds Sheet  *(not started)*
 - [ ] Odds-sheet view derived from engine output (per-prize odds, pool value)

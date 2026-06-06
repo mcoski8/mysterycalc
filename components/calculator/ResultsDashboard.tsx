@@ -15,7 +15,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -28,14 +27,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import type { GameResult, GameTypeMeta, Volatility } from "@/lib/engine";
+import type { GameResult, GameTypeMeta, Volatility, LeadMetric } from "@/lib/engine";
 import { formatUSD, formatPercent, formatNumber, formatMultiple } from "@/lib/format";
-
-type CutLead = "margin" | "profit" | "multiple";
 
 type Props = {
   result: GameResult;
   meta: GameTypeMeta;
+  /** Which cut reading is emphasized — controlled by Calculator so it can
+   *  be saved/restored with a game (Decision 005). */
+  lead: LeadMetric;
+  onLeadChange: (lead: LeadMetric) => void;
 };
 
 // Colors for the three game-feel tiers, reused by the bar and legend.
@@ -51,13 +52,12 @@ const VOLATILITY_STYLE: Record<Volatility, string> = {
   high: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200",
 };
 
-export function ResultsDashboard({ result, meta }: Props) {
-  // Which reading of the cut is emphasized (Decision 005: all three,
-  // user picks the lead). Defaults to margin %.
-  const [lead, setLead] = useState<CutLead>("margin");
-
-  const cuts: { key: CutLead; label: string; value: string }[] = [
-    { key: "margin", label: "Margin kept", value: formatPercent(result.marginPct) },
+export function ResultsDashboard({ result, meta, lead, onLeadChange }: Props) {
+  // Which reading of the cut is emphasized (Decision 005: all three, the
+  // vendor picks the lead). The choice lives in Calculator so it saves with
+  // the game; "percent" is the margin tile.
+  const cuts: { key: LeadMetric; label: string; value: string }[] = [
+    { key: "percent", label: "Margin kept", value: formatPercent(result.marginPct) },
     { key: "profit", label: "Profit (after cost)", value: formatUSD(result.profit) },
     { key: "multiple", label: "Pool multiple", value: formatMultiple(result.poolMultiple) },
   ];
@@ -87,7 +87,7 @@ export function ResultsDashboard({ result, meta }: Props) {
           <button
             key={c.key}
             type="button"
-            onClick={() => setLead(c.key)}
+            onClick={() => onLeadChange(c.key)}
             className={cn(
               "rounded-lg border p-4 text-left transition-colors",
               lead === c.key

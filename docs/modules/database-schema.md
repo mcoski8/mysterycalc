@@ -1,8 +1,11 @@
 # Module — Database Schema (saved games)
 
-> **Location (planned):** `supabase/migrations/`.
-> **Status:** Spec only (Phase 2 — Save & Reuse). The Phase 1 calculator works with NO database.
-> **Related:** Decision 008 (save/reuse needs accounts), `docs/modules/prize-pool.md`.
+> **Location:** `supabase/migrations/20260605120000_init_saved_games.sql` (applied to the live project).
+> **Status:** ✅ **IMPLEMENTED & LIVE (Phase 2, 2026-06-05).** Applied via `supabase db push`; RLS verified
+> end-to-end against the real database. The Phase 1 calculator still works with NO database (graceful
+> degradation). The illustrative tables below were finalized into the migration — see **"As built"** notes.
+> **Related:** Decisions 008 (save/reuse needs accounts), 023–026 (login method, auth architecture, schema &
+> serialization rules, live provisioning), `docs/modules/prize-pool.md`, `lib/saved-games/serialize.ts`.
 
 ---
 
@@ -37,6 +40,12 @@ GOTCHA: exactly **two** of {`buy_in`, `chances`, `target_margin`} are meaningful
 third is derived by the engine at load time, not stored as truth. Storing all three risks drift — store the
 two the vendor fixed and recompute the third.
 
+**As built (Decision 025):** the solved-for knob is stored **NULL**, `solve_for` records which one it is, and a
+DB **CHECK constraint enforces** that the solved knob is NULL (so drift is impossible). `target_margin` is
+stored as a fraction (0.35), converted to/from the UI percent ("35") in `lib/saved-games/serialize.ts`.
+Additional CHECKs constrain `game_type`, `solve_for`, and `lead_metric` to the engine's vocabulary.
+`created_at`/`updated_at` exist; `updated_at` is auto-bumped by a trigger so "My Games" sorts by most-recent.
+
 ### `prize_items`
 One row per prize line in a game's pool.
 | column | type | notes |
@@ -49,6 +58,8 @@ One row per prize line in a game's pool.
 | `cost` | numeric | per unit (vendor-only) |
 | `quantity` | integer | |
 | `is_filler` | boolean | auto-managed filler line (`docs/modules/prize-pool.md`) |
+
+**As built:** also has `position` (integer) to preserve the vendor's on-screen prize-row order on reload.
 
 ### (Phase 3) `odds_sheets` — optional
 If shareable odds sheets get their own persisted/short-linked record, add a table then; otherwise the sheet is

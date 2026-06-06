@@ -29,11 +29,14 @@ import {
   type PrizeItem,
   type GameConfig,
   type GameResult,
+  type LeadMetric,
 } from "@/lib/engine";
 import { formatUSD, formatPercent, formatNumber } from "@/lib/format";
 import { PrizePoolEditor, blankRow, type EditorRow } from "./PrizePoolEditor";
 import { SolverPanel } from "./SolverPanel";
 import { ResultsDashboard } from "./ResultsDashboard";
+import { SavedGamesBar } from "./SavedGamesBar";
+import type { CalculatorSnapshot } from "@/lib/saved-games/serialize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // ---- Seed data: the official worked example, so the page reproduces
@@ -71,13 +74,22 @@ function rowToItem(row: EditorRow): PrizeItem {
   };
 }
 
-export function Calculator() {
+// The calculator can show a "save your games" bar; it needs to know who is
+// logged in. The page passes the vendor's email (or null) down from the server.
+type Props = {
+  userEmail: string | null;
+};
+
+export function Calculator({ userEmail }: Props) {
   const [gameType, setGameType] = useState<GameType>("wallOfSleeves");
   const [rows, setRows] = useState<EditorRow[]>(seedRows);
   const [solveFor, setSolveFor] = useState<SolveFor>("targetMargin");
   const [buyIn, setBuyIn] = useState("20");
   const [chances, setChances] = useState("100");
   const [marginPct, setMarginPct] = useState("35");
+  // Which "cut" reading leads on the dashboard (Decision 005). Lifted here
+  // so it saves and reopens with a game.
+  const [leadMetric, setLeadMetric] = useState<LeadMetric>("percent");
 
   const meta = gameMeta(gameType);
 
@@ -184,8 +196,29 @@ export function Calculator() {
     setGameType(g);
   }
 
+  // A snapshot of everything a saved game needs, kept in sync with the
+  // inputs so the SavedGamesBar can save it at any moment.
+  const snapshot = useMemo<CalculatorSnapshot>(
+    () => ({ gameType, solveFor, buyIn, chances, marginPct, rows, leadMetric }),
+    [gameType, solveFor, buyIn, chances, marginPct, rows, leadMetric],
+  );
+
+  // Reopen a saved game: push every field back into the editor at once.
+  function applySnapshot(s: CalculatorSnapshot) {
+    setGameType(s.gameType);
+    setSolveFor(s.solveFor);
+    setBuyIn(s.buyIn);
+    setChances(s.chances);
+    setMarginPct(s.marginPct);
+    setRows(s.rows);
+    setLeadMetric(s.leadMetric);
+  }
+
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="space-y-6">
+      <SavedGamesBar snapshot={snapshot} onLoad={applySnapshot} userEmail={userEmail} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
       {/* LEFT: inputs */}
       <div className="space-y-6">
         <Card>
@@ -236,7 +269,12 @@ export function Calculator() {
           </CardHeader>
           <CardContent>
             {outcome.kind === "ok" ? (
-              <ResultsDashboard result={outcome.result} meta={meta} />
+              <ResultsDashboard
+                result={outcome.result}
+                meta={meta}
+                lead={leadMetric}
+                onLeadChange={setLeadMetric}
+              />
             ) : outcome.kind === "error" ? (
               <p className="rounded-md border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-100">
                 {outcome.message}
@@ -248,6 +286,7 @@ export function Calculator() {
             )}
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

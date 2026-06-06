@@ -203,4 +203,6 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-05 (Phase 1 / Sprint 1 — Core Calculator built: pure engine + 31 tests + calculator UI; exit gate met).*
+*Last updated: 2026-06-05 (Phase 2 / Sprint 2 — Save & Reuse built: Supabase email+password auth on the
+Next.js 16 SSR pattern, saved-games CRUD, live database + RLS verified end-to-end. Phase 1 engine + UI from
+Sprint 1 unchanged. Phase 2 gate met at the verification level; owner browser click-through pending.)*

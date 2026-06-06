@@ -126,6 +126,13 @@ export type PrizeOdds = {
 export type Volatility = "low" | "medium" | "high";
 
 /**
+ * Which of the three "cut" readings the vendor wants to lead with on the
+ * results dashboard (Decision 005): the margin percent, the dollar profit,
+ * or the pool multiple. Stored with a saved game so it reopens the same way.
+ */
+export type LeadMetric = "percent" | "profit" | "multiple";
+
+/**
  * The engine's answer: every number a vendor needs to judge a game,
  * plus any non-fatal warnings worth showing. (Fatal problems are
  * thrown as EngineError instead — see lib/engine.)

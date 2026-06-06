@@ -118,3 +118,53 @@ Supabase clean.
 - **Razz + multi-item pool:** winner takes ALL items; switching the seeded pool to razz fires a "razz has no
   filler" warning until the vendor trims to the real single prize (per D-022).
 - Owner has not yet clicked through the UI in a browser (verified via SSR only) — worth a human pass.
+
+---
+
+## Session 3 — 2026-06-05 — Phase 2 / Sprint 2: Save & Reuse (built + DB live + RLS verified)
+
+**Accomplished.** Built Phase 2 end-to-end and verified the database half live. Email + password auth on the
+Next.js 16 SSR pattern, full saved-games CRUD, wired into the calculator without breaking the logged-out
+experience. Provisioned the real Supabase project, applied the migration, and verified the whole data path +
+RLS against the live DB (then cleaned up). Pre-flight all green: typecheck ✅, lint ✅, **37/37 tests ✅**
+(31 engine + 6 serialization), build ✅.
+
+**Files added.**
+- *Supabase plumbing:* `lib/supabase/{client,server,proxy,configured}.ts`, root `proxy.ts` (Next 16 renamed
+  middleware→proxy).
+- *Auth:* `app/login/page.tsx`, `app/login/actions.ts`, `components/account/{LoginForm,AccountMenu}.tsx`,
+  `app/auth/confirm/route.ts`.
+- *Saved games:* `lib/saved-games/serialize.ts` (pure, tested), `lib/saved-games/actions.ts` (server actions),
+  `components/calculator/SavedGamesBar.tsx`, `tests/saved-games.test.ts`.
+- *DB:* `supabase/config.toml`, `supabase/migrations/20260605120000_init_saved_games.sql`.
+- *Env:* `.env.example` (committed template); `.env.local` (gitignored, holds the live keys).
+
+**Files changed.** `lib/types.ts` (+`LeadMetric`), `components/calculator/Calculator.tsx` (lifts lead-metric +
+snapshot + applySnapshot + SavedGamesBar + `userEmail` prop), `components/calculator/ResultsDashboard.tsx`
+(controlled lead, `"margin"`→`"percent"`), `app/page.tsx` (reads session, AccountMenu, passes userEmail),
+`package.json`/lock (+@supabase/ssr, @supabase/supabase-js).
+
+**Decided (see DECISIONS_LOG.md):** D-023 login = email+password; D-024 SSR auth architecture (@supabase/ssr +
+proxy.ts + server-action/RLS enforcement + graceful degradation); D-025 saved-games schema & serialization
+(NULL the solved knob, DB CHECK enforces no-drift, margin as fraction, `position`, lifted lead-metric);
+D-026 live provisioning + verification record (project `txrlpwvmawwfuuzedfbw`).
+
+**Live verification (real DB, cleaned up after).** Two confirmed users via admin API; A inserts game + 2
+prize_items → A reads 1 / B reads 0 (own), B reads 0 of A's by id, B reads 0 of A's prize_items (RLS); CHECK
+rejects non-NULL solved knob; B cannot insert as A (RLS). All passed.
+
+**Open / next.**
+1. **Owner browser click-through** (the only thing left for the Phase 2 gate): at `npm run dev`, sign up,
+   build a game, Save, reload, reopen it, duplicate it.
+2. **Optional:** disable email confirmation for instant signup (Dashboard → Authentication → Sign In /
+   Providers → Email → off "Confirm email"). Signup already works without this via `/auth/confirm`.
+3. Then **Phase 3 — Customer Odds Sheet** (per-prize odds already computed by the engine).
+
+**Landmines.**
+- **Next 16: `middleware`→`proxy`.** File `proxy.ts`, fn `proxy`, Node runtime, matcher excludes static assets.
+- **Don't trust the proxy for authz** — it only refreshes the cookie; server actions re-check the user + RLS is
+  the boundary (verified).
+- **Email confirmation likely ON by default** — handled by `/auth/confirm`; turn off for smoother signup.
+- **Public key = legacy anon JWT** (verified). `sb_publishable_…` fallback is commented in `.env.local`.
+- **Secrets only in gitignored `.env.local`.** Never commit; never expose the service-role key client-side.
+- Home page is now dynamic (`ƒ`) because it reads the session — expected.

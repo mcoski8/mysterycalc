@@ -1,0 +1,30 @@
+# Supabase project config for MysteryCalc.
+# Reference: https://supabase.com/docs/guides/local-development/cli/config
+# This file records the project's local CLI config. The live (hosted)
+# project's settings are managed in the Supabase dashboard.
+project_id = "mysterycalc"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[auth]
+enabled = true
+# The base URL of the site, used to build links in confirmation emails.
+site_url = "http://localhost:3000"
+# URLs auth is allowed to redirect back to after sign-in / confirmation.
+additional_redirect_urls = ["http://localhost:3000/auth/confirm"]
+
+[auth.email]
+enable_signup = true
+# For frictionless local testing you may turn this off in the dashboard so
+# new accounts work without a confirmation email (Auth → Providers → Email).
+enable_confirmations = false

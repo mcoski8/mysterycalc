@@ -9,17 +9,35 @@
 // ============================================================
 
 import { Calculator } from "@/components/calculator/Calculator";
+import { AccountMenu } from "@/components/account/AccountMenu";
+import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/configured";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
-export default function Home() {
+export default async function Home() {
+  // Read the current session on the server so the header and the saved-games
+  // bar know who's logged in (the calculator itself works either way). Before
+  // Supabase is configured we simply treat everyone as logged-out.
+  let userEmail: string | null = null;
+  if (isSupabaseConfigured()) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userEmail = user?.email ?? null;
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:py-12">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{APP_NAME}</h1>
-        <p className="mt-1 text-muted-foreground">{APP_TAGLINE}</p>
+      <header className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{APP_NAME}</h1>
+          <p className="mt-1 text-muted-foreground">{APP_TAGLINE}</p>
+        </div>
+        <AccountMenu userEmail={userEmail} />
       </header>
 
-      <Calculator />
+      <Calculator userEmail={userEmail} />
 
       <footer className="mt-16 border-t pt-6 text-xs text-muted-foreground">
         <p>
