@@ -28,6 +28,10 @@ Run **only the checks relevant** to what was touched this session. Skip what doe
 1. **Uncommitted changes:** `git status` — commit what should be committed; clean up what shouldn't be in
    the repo. **Never commit `.env*` files or keys.**
 2. **Branch state:** if on a feature branch, note where it is.
+3. **Commit + push to `origin/main` — MANDATORY every session** (owner enabled 2026-06-05, Decision 019).
+   Session-end pushes are **pre-authorized** — attempt the push without asking. Remote:
+   `https://github.com/mcoski8/mysterycalc`. (A sandbox/network block on the push is not the owner
+   reconsidering — report it and move on.)
 
 If any check fails, **fix it before updating docs.** Leave the project in a known-good state.
 

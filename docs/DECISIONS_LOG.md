@@ -132,3 +132,10 @@
 **Options:** Lock as-is | Request changes
 **Choice:** **Lock as-is.** Owner said "lock it." All five §10 open items resolved (Decisions 014–017 + no further changes). `docs/PROPOSAL.md` status → SIGNED OFF. **Phase 0 (Planning & Docs) exit gate is met; Phase 1 (Core Calculator) is cleared to begin.**
 **Why:** The proposal captured the full product + technical architecture and the owner reviewed it (via the plain-text summary) and approved it with no changes. Per the project's phase discipline (Decision 013 / `PROCESS.md`), application code may now begin — starting with scaffolding the Next.js app and building the pure calculation engine in `lib/` first, per `docs/sprints/s1-core-calculator.md`.
+
+## Decision 019 — GitHub remote + mandatory commit-and-push every session
+**Date:** 2026-06-05
+**Question:** Where does the repo live, and what is the commit/push cadence?
+**Options:** Local only | Push on request | Commit + push to origin/main every session (auto)
+**Choice:** Remote = **`https://github.com/mcoski8/mysterycalc`** (origin/main). **Commit + push to origin/main is MANDATORY at every session close, pre-authorized — attempt the push without asking.**
+**Why:** The owner enabled this to match their other projects (PokeSentry, PokeHolder, TrendRadar, Taiwanese). It guarantees nothing is lost between sessions and the remote is always current. Encoded in `docs/session-end-prompt.md` (Pre-Flight → Always → step 3). A sandbox/network block on a push is not the owner reconsidering — report and continue.
