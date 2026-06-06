@@ -173,6 +173,43 @@ export async function loadGame(
   };
 }
 
+/**
+ * Load a saved game's NAME + full snapshot together — what the customer
+ * odds sheet needs (the sheet prints the game's name at the top, which
+ * `loadGame` alone doesn't return). Auth-checked; RLS guarantees the caller
+ * can only read their own game.
+ */
+export async function loadGameForSheet(
+  id: string,
+): Promise<Result<{ name: string; snapshot: CalculatorSnapshot }>> {
+  const supabase = await createClient();
+  const userId = await currentUserId(supabase);
+  if (!userId) return { ok: false, error: "Please log in to view the odds sheet." };
+
+  const { data: game, error: gameErr } = await supabase
+    .from("games")
+    .select("*")
+    .eq("id", id)
+    .single<GameRow>();
+  if (gameErr || !game) {
+    return { ok: false, error: gameErr?.message ?? "Game not found." };
+  }
+
+  const { data: items, error: itemsErr } = await supabase
+    .from("prize_items")
+    .select("*")
+    .eq("game_id", id);
+  if (itemsErr) return { ok: false, error: itemsErr.message };
+
+  return {
+    ok: true,
+    data: {
+      name: game.name,
+      snapshot: gameRowToSnapshot(game, (items ?? []) as PrizeItemRow[]),
+    },
+  };
+}
+
 /** Rename a saved game in place. */
 export async function renameGame(
   id: string,

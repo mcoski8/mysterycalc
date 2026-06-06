@@ -25,6 +25,7 @@ import {
   Pencil,
   Check,
   X,
+  ScrollText,
 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -280,6 +281,18 @@ export function SavedGamesBar({ snapshot, onLoad, userEmail }: Props) {
                       <Button size="icon" variant="ghost" aria-label="Open" onClick={() => handleOpen(g.id)} disabled={pending}>
                         <FolderOpen className="size-4" />
                       </Button>
+                      {/* Customer-facing odds sheet for this game (Phase 3). Opens
+                          in a new tab so the vendor keeps their editing session. */}
+                      <Link
+                        href={`/games/${g.id}/odds`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Customer odds sheet"
+                        title="Customer odds sheet"
+                        className={buttonVariants({ size: "icon", variant: "ghost" })}
+                      >
+                        <ScrollText className="size-4" />
+                      </Link>
                       <Button
                         size="icon"
                         variant="ghost"

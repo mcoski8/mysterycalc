@@ -19,6 +19,7 @@ import type {
   SolveFor,
   PrizeType,
   PrizeItem,
+  GameConfig,
   LeadMetric,
 } from "@/lib/engine";
 import type { EditorRow } from "@/components/calculator/PrizePoolEditor";
@@ -199,4 +200,38 @@ export function editorRowsToItems(rows: EditorRow[]): PrizeItem[] {
     quantity: Math.round(num(row.quantity)),
     isFiller: row.isFiller,
   }));
+}
+
+/**
+ * Turn a SAVED snapshot into the two things the engine needs to solve a
+ * game: the prize items and a GameConfig.
+ *
+ * Plain English: a saved game stores two of the three knobs {buy-in,
+ * chances, margin} and leaves the third (the one being "solved for") blank
+ * — the engine recomputes it. So here we pass along the two real knobs and
+ * leave the solved one `undefined`, exactly as the live calculator does.
+ * Margin is stored on screen as a percent string ("35") and the engine
+ * wants a fraction (0.35), so we divide by 100.
+ *
+ * This mirrors the input-assembly in Calculator.tsx, but pure (no React),
+ * so the odds-sheet builder and its tests can reuse it. It assumes a
+ * COMPLETE saved game (both stored knobs present); the live calculator,
+ * which also handles half-typed input, keeps its own guarded version.
+ */
+export function snapshotToSolveInput(snapshot: CalculatorSnapshot): {
+  items: PrizeItem[];
+  config: GameConfig;
+} {
+  const { solveFor } = snapshot;
+  const config: GameConfig = {
+    gameType: snapshot.gameType,
+    solveFor,
+    // Pass a knob only if it is NOT the one being solved for.
+    buyIn: solveFor === "buyIn" ? undefined : num(snapshot.buyIn),
+    chances:
+      solveFor === "chances" ? undefined : Math.round(num(snapshot.chances)),
+    targetMargin:
+      solveFor === "targetMargin" ? undefined : num(snapshot.marginPct) / 100,
+  };
+  return { items: editorRowsToItems(snapshot.rows), config };
 }

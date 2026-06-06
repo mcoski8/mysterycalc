@@ -63,18 +63,21 @@
 
 ---
 
-## Phase 2 — Save & Reuse  *(✅ Sprint 2 built + DB live + RLS verified — 2026-06-05; owner browser click-through pending)*
+## Phase 2 — Save & Reuse  *(✅ COMPLETE — Sprint 2 built + DB live + RLS verified 2026-06-05; owner browser click-through confirmed 2026-06-06)*
 - [x] Supabase project + auth (login) — project `txrlpwvmawwfuuzedfbw`; email+password (Decision 023)
 - [x] Schema + migration for saved games & prize items (see `docs/modules/database-schema.md`) — applied via `db push`
 - [x] Save / load / rename / duplicate / delete game setups — `lib/saved-games/*` + `SavedGamesBar.tsx`
 - [x] Row-level security (a user sees only their own games) — **verified end-to-end against the live DB**
-- [ ] Owner browser click-through: sign up → save → reopen → duplicate (final Phase 2 gate confirmation)
+- [x] Owner browser click-through: sign up → save → reopen → duplicate (final Phase 2 gate — **confirmed 2026-06-06**)
 - [ ] (Optional) disable email confirmation in the Supabase dashboard for instant signup
 
-## Phase 3 — Customer Odds Sheet  *(not started)*
-- [ ] Odds-sheet view derived from engine output (per-prize odds, pool value)
-- [ ] Print stylesheet + shareable link
-- [ ] Vendor branding / disclaimer line
+## Phase 3 — Customer Odds Sheet  *(✅ Sprint 3 built + owner-verified — 2026-06-06; print/PDF first, Decision 027)*
+- [x] Odds-sheet view derived from engine output (per-prize odds, pool value) — pure `lib/odds-sheet/build.ts` (Decision 028)
+- [x] Print stylesheet — `@media print` in `app/globals.css`; **public share link deferred to Phase 3+ (Decision 027)**
+- [x] Vendor branding / disclaimer line — optional editable shop/event name + disclaimer in `OddsSheetView.tsx`
+- [x] "Customer odds sheet" entry point per saved game — `SavedGamesBar.tsx` → `/games/{id}/odds`
+- [x] Hard rule: NO cost/profit/margin on the customer sheet — enforced by `tests/odds-sheet.test.ts`
+- [ ] (Deferred) Public no-login share link — needs a share token + public-read path that still hides cost (Phase 3+)
 
 ## Phase 4 — Price Lookup  *(not started)*
 - [ ] Implement the price-source interface against pokemontcg.io / TCGPlayer

@@ -128,3 +128,31 @@
     @apply font-sans;
   }
 }
+
+/* ------------------------------------------------------------
+   Print rules — used by the customer odds sheet (Phase 3).
+   Plain English: when the vendor prints (or "Save as PDF"), hide the
+   on-screen-only chrome (anything tagged `.no-print` — the back link,
+   the print button, the shop-name input) and lay the sheet out flat on
+   white paper, edge to edge, with no card border/shadow getting in the way.
+   ------------------------------------------------------------ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  /* Print in plain black-on-white regardless of the screen theme. */
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Let the sheet use the full page; drop the on-screen card framing. */
+  article {
+    max-width: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}

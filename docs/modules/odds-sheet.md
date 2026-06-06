@@ -1,8 +1,12 @@
 # Module — Customer Odds Sheet
 
-> **Location (planned):** `app/` route + a print stylesheet; derives data from the engine.
-> **Status:** Spec only (Phase 3 — after the calculator and saving exist).
-> **Related:** `docs/modules/calculation-engine.md` (provides per-prize odds), Decision 007.
+> **Location (built):** route `app/games/[id]/odds/page.tsx` + `components/odds-sheet/OddsSheetView.tsx` +
+> pure builder `lib/odds-sheet/build.ts` + `@media print` rules in `app/globals.css`. Entry point: the
+> "Customer odds sheet" link per game in `components/calculator/SavedGamesBar.tsx`.
+> **Status:** ✅ **Built + owner-verified (2026-06-06, Sprint 3).** Print/PDF first; a public no-login share
+> link is deferred to Phase 3+ (Decision 027). The customer-safe boundary (no cost/profit/margin) is enforced
+> by `tests/odds-sheet.test.ts` (Decision 028).
+> **Related:** `docs/modules/calculation-engine.md` (provides per-prize odds), Decisions 007, 027, 028.
 
 ---
 

@@ -168,3 +168,45 @@ rejects non-NULL solved knob; B cannot insert as A (RLS). All passed.
 - **Public key = legacy anon JWT** (verified). `sb_publishable_…` fallback is commented in `.env.local`.
 - **Secrets only in gitignored `.env.local`.** Never commit; never expose the service-role key client-side.
 - Home page is now dynamic (`ƒ`) because it reads the session — expected.
+
+---
+
+## Session 4 — 2026-06-06 — Phase 2 gate closed + Phase 3 (Customer Odds Sheet) built
+
+**Accomplished.**
+- **Phase 2 gate fully closed:** owner did the browser click-through (sign up → build → save → reload →
+  reopen → duplicate) and confirmed it works. S2 and Phase 2 are now Complete.
+- **Phase 3 — Customer Odds Sheet built (print/PDF first) and owner-verified in the browser** incl. print
+  preview. It turns a *saved* game into a clean customer-facing sheet (prize pool + odds), reachable from "My
+  games." Pre-flight all green: typecheck ✅, lint ✅, **41/41 tests ✅** (4 new), build ✅. Unauthenticated
+  `/games/[id]/odds` correctly 307s → `/login` (curl-verified).
+
+**Files (new unless noted).**
+- `lib/odds-sheet/build.ts` — pure `buildOddsSheet(snapshot, name)` → `OddsSheet` view-model. Reuses the
+  engine's `perPrizeOdds` (no new math). **Builds no cost/profit/margin field** — the customer-safe boundary.
+- `lib/saved-games/serialize.ts` (mod) — added pure `snapshotToSolveInput(snapshot)` → `{ items, config }`.
+- `lib/saved-games/actions.ts` (mod) — added auth-checked `loadGameForSheet(id)` → `{ name, snapshot }`.
+- `app/games/[id]/odds/page.tsx` — auth-gated Server Component (load → build → render; EngineError → friendly
+  message). Next 16: `params` is a Promise (awaited).
+- `components/odds-sheet/OddsSheetView.tsx` — printable sheet + optional editable shop name + Print/Back
+  (`.no-print`). Odds as `%` and "1 in N". Razz single-winner note.
+- `app/globals.css` (mod) — `@media print` rules.
+- `components/calculator/SavedGamesBar.tsx` (mod) — per-game "Customer odds sheet" link (scroll icon, new tab).
+- `tests/odds-sheet.test.ts` — 4 tests incl. the **no-cost/profit/margin-leak** guard.
+
+**Decided.** D-027 (Phase 3 = print/PDF first; public share link deferred to Phase 3+). D-028 (odds-sheet
+architecture: pure builder + test-enforced customer-safe boundary). See DECISIONS_LOG.md.
+
+**Open / next.**
+1. **Phase 4 — Price Lookup** is the next phase: search a card → market value auto-fills (pokemontcg.io /
+   TCGPlayer behind a pluggable interface; manual entry stays as fallback). See `docs/modules/price-sources.md`.
+2. **Deferred within Phase 3:** the public no-login **share link** (share token + public-read path that still
+   hides cost/profit — do NOT relax RLS on `games`/`prize_items`, those rows contain cost).
+3. **Known debt:** broad UI/UX polish pass (owner noted) — slot into Phase 5 (Launch), not blocking.
+
+**Landmines.**
+- **Don't construct JSX inside a `try/catch`** in a Server Component (ESLint `react-hooks/error-boundaries`).
+  Compute into a variable in the `try`, return JSX after.
+- **`perPrizeOdds` carries no market value** — the sheet merges value by item position; razz's trailing "No
+  prize" line has no item (worth $0). Revisit if the engine ever reorders `perPrizeOdds`.
+- **Shop name is transient** (on-page only, not saved) — a persisted vendor brand is a future enhancement.

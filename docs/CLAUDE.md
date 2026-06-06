@@ -203,6 +203,7 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-05 (Phase 2 / Sprint 2 — Save & Reuse built: Supabase email+password auth on the
-Next.js 16 SSR pattern, saved-games CRUD, live database + RLS verified end-to-end. Phase 1 engine + UI from
-Sprint 1 unchanged. Phase 2 gate met at the verification level; owner browser click-through pending.)*
+*Last updated: 2026-06-06 (Phase 3 / Sprint 3 — Customer Odds Sheet built + owner-verified: a print/PDF
+customer-facing odds sheet derived from a saved game, with the cost/profit/margin boundary enforced by a test.
+Phase 2 fully Complete — owner browser click-through confirmed. Public odds-sheet share link deferred to
+Phase 3+ (Decision 027). Next: Phase 4 — Price Lookup.)*
