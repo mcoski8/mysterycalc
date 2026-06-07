@@ -84,8 +84,18 @@
 - [x] Card search → auto-fill market value — `CardSearch.tsx` + `Calculator.handleAddFromCard` (owner-verified)
 - [x] Cache / rate-limit handling — `app/api/prices/search/route.ts` (24h in-memory cache + per-process rate guard)
 - [x] Pure extraction unit-tested — `tests/prices.test.ts` (8); host-agnostic `<img>` for thumbnails (Decision 030)
-- [ ] (Next sprint) Sealed-product pricing via **tcgcsv** — needs a nightly sync/index into Supabase (Decision 031)
 - [ ] (Permanently manual) Graded (PSA/BGS/CGC) — no free source (not in TCGPlayer's catalog)
+
+## Phase 4 / Sprint 4.5 — Sealed-product pricing via tcgcsv  *(✅ BUILT + owner-verified — 2026-06-06; Decisions 031–032)*
+- [x] Research sync/index design (live tcgcsv probes + Gemini consult) + plan before building
+- [x] `sealed_products` table + RLS (`select using(true)`, service-role-only writes) + pg_trgm index — applied to remote DB
+- [x] Empirically-validated sealed detection (no `Number`/`Rarity`) — `lib/sealed/classify.ts` + 8 tests (Decision 032)
+- [x] Sync core `lib/sealed/sync.ts` (single full-sync path, ≈4.6s) + cookie-free clients `lib/sealed/db.ts`
+- [x] Local populate via `npx tsx scripts/sync-sealed.ts` — **1,848 sealed products** across 217 sets
+- [x] Nightly Vercel Cron `app/api/cron/sync-sealed` + `vercel.json` (CRON_SECRET-protected) — code ready
+- [x] `TcgCsvPriceSource` + `CompositePriceSource` (sealed first) behind the existing interface
+- [x] `CardSearch` Sealed badge + type label; `handleAddFromCard` sets prize `type=sealed`; `kind` on candidate
+- [ ] (Deferred to Phase 5 deploy) Set `CRON_SECRET` + service-role key in the Vercel dashboard to activate the cron
 
 ## Phase 5 — Launch  *(not started)*
 - [ ] Polish + accessibility pass

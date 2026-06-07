@@ -100,7 +100,7 @@ export function CardSearch({ onPick }: Props) {
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             aria-label="Search for a card by name"
-            placeholder="Find a card by name (e.g. Charizard ex) to auto-fill its value…"
+            placeholder="Find a card or sealed product (e.g. Charizard ex, or Booster Box) to auto-fill its value…"
             className="pl-8 pr-8"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -119,8 +119,9 @@ export function CardSearch({ onPick }: Props) {
           )}
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Optional. Prices are TCGPlayer market values for raw singles. Sealed and graded
-          (PSA/BGS) prices aren&apos;t available — enter those by hand.
+          Optional. Prices are TCGPlayer market values for raw singles and sealed product
+          (booster boxes, ETBs, packs). Graded (PSA/BGS) prices aren&apos;t available — enter
+          those by hand.
         </p>
       </div>
 
@@ -170,10 +171,24 @@ export function CardSearch({ onPick }: Props) {
                   <div className="h-11 w-8 shrink-0 rounded-sm bg-muted" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium">{c.name}</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate text-sm font-medium">{c.name}</span>
+                    {c.kind === "sealed" && (
+                      <Badge variant="secondary" className="shrink-0 text-[10px]">
+                        Sealed
+                      </Badge>
+                    )}
+                  </div>
                   <div className="truncate text-xs text-muted-foreground">
-                    {c.setName} · #{c.number}
-                    {c.rarity ? ` · ${c.rarity}` : ""}
+                    {/* Singles read "Set · #number · rarity"; sealed product has
+                        no card number, so it reads "Set · Booster Box" etc. */}
+                    {[
+                      c.setName,
+                      c.kind === "single" && c.number ? `#${c.number}` : null,
+                      c.kind === "single" ? c.rarity : c.priceLabel,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </div>
                 </div>
                 <div className="shrink-0 text-right">

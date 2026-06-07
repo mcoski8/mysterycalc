@@ -206,8 +206,10 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-06 (Phase 4 / Sprint 4 — Price Lookup built + owner-verified: type a card name → its
-TCGPlayer market value auto-fills a new prize row, behind a pluggable price-source interface, with manual entry
-as the fallback. Singles via pokemontcg.io. Sealed-product pricing via tcgcsv is adopted (Decision 031) and
-deferred to Sprint 4.5; graded stays manual. Phases 1–4 all DONE and owner-verified. Next: Sprint 4.5 — sealed
-pricing via tcgcsv.)*
+*Last updated: 2026-06-06 (Phase 4 COMPLETE — Sprint 4.5 sealed pricing built + owner-verified. Singles via
+pokemontcg.io (S4) + SEALED product via tcgcsv (S4.5): a nightly sync indexes 1,848 sealed products into
+Supabase, searched via a `CompositePriceSource` behind the same interface; type a card OR a booster box/ETB/pack
+→ its TCGPlayer market value auto-fills a prize row. Sealed detection = field-absence, Decision 032. Graded
+stays manual. New: `lib/sealed/`, `scripts/sync-sealed.ts` (run via tsx), `app/api/cron/sync-sealed` +
+`vercel.json` (cron dormant until Phase 5 deploy). Phases 1–4 all DONE and owner-verified. Next: Phase 5 —
+Launch.)*

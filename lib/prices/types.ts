@@ -36,6 +36,12 @@ export type PriceQuery = {
 export type PriceCandidate = {
   /** The provider's stable id (e.g. pokemontcg "swsh4-25"); used as a list key. */
   id: string;
+  /**
+   * Is this a raw SINGLE card or a SEALED product (booster box, ETB, pack…)?
+   * Drives the badge in the picker and the prize-row `type` we pre-fill.
+   * Singles come from pokemontcg.io; sealed comes from our tcgcsv index.
+   */
+  kind: "single" | "sealed";
   name: string;
   /** The set/expansion this printing belongs to (e.g. "Vivid Voltage"). */
   setName: string;

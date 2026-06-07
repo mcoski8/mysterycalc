@@ -185,15 +185,18 @@ export function Calculator({ userEmail }: Props) {
     setRows([...realRows, fillerRow]);
   }
 
-  // Phase 4: a vendor picked a card from the search. Add it as a new,
-  // non-filler prize row pre-filled with its name and looked-up market value
-  // (blank when the card had no price). Cost and quantity are left for the
-  // vendor — we only know the market value, never what they paid.
+  // Phase 4 / 4.5: a vendor picked a card or sealed product from the search.
+  // Add it as a new, non-filler prize row pre-filled with its name and
+  // looked-up market value (blank when it had no price). The prize TYPE follows
+  // what they picked — a single card vs. sealed product (booster box, ETB,
+  // pack) — which only affects the on-screen label, never the math. Cost and
+  // quantity are left for the vendor — we only know market value, not what they
+  // paid.
   function handleAddFromCard(candidate: PriceCandidate) {
     const row: EditorRow = {
       ...blankRow(),
       name: candidate.name,
-      type: "single",
+      type: candidate.kind === "sealed" ? "sealed" : "single",
       marketValue: candidate.marketValue !== null ? String(candidate.marketValue) : "",
       cost: "",
       quantity: "1",

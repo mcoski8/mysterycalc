@@ -112,6 +112,7 @@ export function rawToCandidate(raw: RawCard): PriceCandidate {
   const picked = pickMarketValue(raw.tcgplayer?.prices);
   return {
     id: raw.id ?? `${raw.name ?? "card"}-${raw.number ?? "?"}`,
+    kind: "single",
     name: raw.name ?? "Unknown card",
     setName: raw.set?.name ?? "—",
     number: raw.number ?? "—",

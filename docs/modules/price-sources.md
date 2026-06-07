@@ -3,8 +3,8 @@
 > **Location:** `lib/prices/` (interface + sources), `app/api/prices/search/route.ts` (the endpoint),
 > `components/calculator/CardSearch.tsx` (the UI).
 > **Status:** ✅ **BUILT (Phase 4 / Sprint 4, 2026-06-06).** Automatic singles lookup via pokemontcg.io is
-> live and owner-verified; manual entry remains the always-available fallback. Sealed-product pricing via
-> **tcgcsv** is adopted but deferred to its own sprint (Decision 031). Graded stays manual (no free source).
+> live and owner-verified; manual entry remains the always-available fallback. **Sealed-product pricing via
+> tcgcsv is now BUILT too (Sprint 4.5, Decisions 031–032)** — see that section below. Graded stays manual.
 > **Related:** PokeHolder's `price-engine` / `data-sources` docs (reuse those learnings — incl. its
 > `scripts/sync-tcgcsv.mjs`, the template for our future sealed sync).
 
@@ -25,15 +25,26 @@
   value (cost/quantity left to the vendor). Thumbnails use a host-agnostic `<img>` (Decision 030 — the image
   CDN migrates between `images.pokemontcg.io` and `images.scrydex.com`).
 
-## Sealed-product pricing via tcgcsv (adopted, next sprint — Decision 031)
+## Sealed-product pricing via tcgcsv (✅ BUILT — Sprint 4.5, Decisions 031–032)
 
 - **tcgcsv.com relays TCGPlayer's full catalog for free** (`https://tcgcsv.com/tcgplayer/3` = Pokémon;
   `/groups`, `/{group}/products`, `/{group}/prices`). Key-less, ~daily refresh, asks for a `User-Agent`.
-- **Sealed IS included with prices** — verified live (set "Perfect Order": Booster Box $222.34, Elite Trainer
-  Box $76.31, Pokémon Center ETB $142.52, Booster Bundle $40.34, Booster Pack $5.91, … 31 sealed products).
-- **Catch:** it's a *bulk catalog, not a search API* → needs a small **nightly sync/index into Supabase**
-  before sealed can be searched (mirror PokeHolder's `scripts/sync-tcgcsv.mjs`). Then add a `TcgCsvPriceSource`
-  behind the existing interface and surface sealed results in `CardSearch`.
+- **It's a bulk catalog, not a search API**, so a sync copies just the sealed rows + prices into a Supabase
+  table (`sealed_products`), and the app searches THAT. **1,848 priced sealed products across 217 sets**
+  indexed (full sync ≈ 4.6s).
+- **Sealed detection (Decision 032):** a product is sealed iff its `extendedData` has **no `Number` and no
+  `Rarity`** (singles carry `Number`; code cards carry `Rarity`). Empirically zero false positives 1999→2026.
+  `lib/sealed/classify.ts` (pure, tested). Keywords only derive the cosmetic `product_type` label.
+- **Sync:** `lib/sealed/sync.ts` `syncSealed()` (UA + concurrency 6, full-row upserts). Two entry points share
+  it: `scripts/sync-sealed.ts` (`npx tsx`, initial populate / on-demand) and `app/api/cron/sync-sealed`
+  (nightly Vercel Cron, `CRON_SECRET`-protected, `maxDuration=60`; scheduled in `vercel.json`). Writes use the
+  service role (`lib/sealed/db.ts#adminClient`); reads use anon (`readClient`). **The cron activates only after
+  the Phase 5 Vercel deploy** (needs `CRON_SECRET` + service-role key in the Vercel dashboard); until then the
+  local script keeps the index fresh.
+- **Read path:** `lib/prices/tcgcsv.ts` `TcgCsvPriceSource.search` (ILIKE the table, `kind:"sealed"`) +
+  `lib/prices/composite.ts` `CompositePriceSource([tcgcsv, pokemontcg])` (parallel, sealed first).
+  `getActivePriceSource()` returns the composite; the `/api/prices/search` route is unchanged. `CardSearch`
+  shows a "Sealed" badge + type label; picking one sets the prize `type` to `sealed`.
 - **Graded (PSA/BGS/CGC) stays manual** — not in TCGPlayer's catalog, so no free source exists.
 
 ---
