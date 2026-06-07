@@ -18,7 +18,10 @@ export default async function LoginPage() {
   // instead of a form that would error.
   if (!isSupabaseConfigured()) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center">
+      <main
+        id="main-content"
+        className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center"
+      >
         <h1 className="mb-3 text-2xl font-bold tracking-tight">{APP_NAME}</h1>
         <p className="max-w-sm text-sm text-muted-foreground">
           Accounts aren&apos;t connected yet. The calculator still works without
@@ -28,7 +31,7 @@ export default async function LoginPage() {
           </Link>
           .
         </p>
-      </div>
+      </main>
     );
   }
 
@@ -40,9 +43,12 @@ export default async function LoginPage() {
   if (user) redirect("/");
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+    <main
+      id="main-content"
+      className="flex flex-1 flex-col items-center justify-center px-4 py-12"
+    >
       <h1 className="mb-6 text-2xl font-bold tracking-tight">{APP_NAME}</h1>
       <LoginForm />
-    </div>
+    </main>
   );
 }

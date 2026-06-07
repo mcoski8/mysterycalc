@@ -97,11 +97,17 @@
 - [x] `CardSearch` Sealed badge + type label; `handleAddFromCard` sets prize `type=sealed`; `kind` on candidate
 - [ ] (Deferred to Phase 5 deploy) Set `CRON_SECRET` + service-role key in the Vercel dashboard to activate the cron
 
-## Phase 5 — Launch  *(not started)*
-- [ ] Polish + accessibility pass
-- [ ] Deploy to Vercel
-- [ ] Custom domain
-- [ ] "Not affiliated with Nintendo / The Pokémon Company" footer
+## Phase 5 — Launch  *(✅ COMPLETE — Sprint 5, 2026-06-06; live at https://mysterycalc.vercel.app)*
+- [x] Polish + accessibility pass — app-wide `SiteFooter`, `<main>` landmarks + skip-to-content link, enriched metadata
+- [x] Final public name = "MysteryCalc" (Decision 033, confirms 017)
+- [x] Deploy to Vercel (free `.vercel.app`, Hobby) — `mysterycalc.vercel.app` (Decision 034)
+- [x] GitHub connected for auto-deploy (push to `origin/main` → production)
+- [x] Set Vercel env vars (Supabase prod+dev) + `CRON_SECRET` (prod) → **sealed cron ACTIVE** (`/api/cron/sync-sealed`, daily 09:00 UTC)
+- [x] "Not affiliated with Nintendo / The Pokémon Company" footer — app-wide via `SiteFooter` (Decision 012)
+- [x] Verified live: home 200, login 200, cron 401-without-secret, price-search API returns sealed candidates
+- [ ] (Deferred — Decision 034) Custom domain — add via Vercel dashboard anytime; then set `NEXT_PUBLIC_SITE_URL`
+- [ ] (Owner, optional) Supabase Auth Site URL → production + (optional) disable email confirmation
+- [ ] (Deferred) Preview-env Supabase vars — CLI v54.6.1 quirk; add via dashboard if preview login/save ever needed
 
 ## Deferred / Future  *(explicitly out of current scope)*
 - [ ] ~~Claw / UFO catcher~~ — out permanently (no fixed pool of chances)

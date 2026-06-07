@@ -37,15 +37,12 @@ export default async function Home() {
         <AccountMenu userEmail={userEmail} />
       </header>
 
-      <Calculator userEmail={userEmail} />
-
-      <footer className="mt-16 border-t pt-6 text-xs text-muted-foreground">
-        <p>
-          {APP_NAME} is a planning tool for game economics. It does math and
-          disclosure only — it doesn&apos;t run games or process payments. Not
-          affiliated with Nintendo, The Pokémon Company, or any rights holder.
-        </p>
-      </footer>
+      {/* The calculator is the page's primary content — the skip-to-content
+          link (in the layout) jumps here. The disclaimer footer now lives
+          app-wide in the layout (SiteFooter), so it's not repeated here. */}
+      <main id="main-content">
+        <Calculator userEmail={userEmail} />
+      </main>
     </div>
   );
 }

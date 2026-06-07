@@ -47,7 +47,7 @@ export function OddsSheetView({ sheet }: { sheet: OddsSheet }) {
   const chanceWord = sheet.chances === 1 ? sheet.chanceWord : sheet.chanceWordPlural;
 
   return (
-    <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:py-12">
+    <main id="main-content" className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:py-12">
       {/* On-screen controls — hidden when printing. */}
       <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
@@ -157,7 +157,7 @@ export function OddsSheetView({ sheet }: { sheet: OddsSheet }) {
           </p>
         </footer>
       </article>
-    </div>
+    </main>
   );
 }
 

@@ -110,3 +110,56 @@ keyword AND-filter (it drops keyword-less sealed product like "Collector Chest")
   only). No user data, no cost/profit — safe to expose to anon reads.
 - **Search ordering is sealed-first by value** — broad terms ("charizard") show sealed collections above
   single cards. Owner accepted this. Tune later only if it annoys.
+
+---
+
+## Session 7 — 2026-06-06 — Phase 5 (Launch) COMPLETE — live on Vercel
+
+**Accomplished.**
+- **MysteryCalc is LIVE: https://mysterycalc.vercel.app** (Vercel **Hobby/free**, project
+  `michaels-projects-eace96e9/mysterycalc`). **Phase 5 exit criterion met → all five phases done.**
+- **Final public name settled = "MysteryCalc"** (D-033, confirms D-017). **Launch domain = free
+  `.vercel.app`** (D-034) — mirrors PokeHolder; custom domain deferred (one dashboard step, no code change).
+- **Accessibility + SEO polish pass:** app-wide `SiteFooter` (the D-012 "not affiliated" disclaimer now on
+  every page via the root layout, `no-print` so the customer odds sheet is unaffected); `<main
+  id="main-content">` landmarks on all pages + a skip-to-content link; enriched metadata
+  (OpenGraph/Twitter/robots/theme-color, `metadataBase` from the Vercel URL).
+- **Pre-flight all green:** typecheck ✅, lint ✅, **57/57 tests ✅**, build ✅.
+- **Deploy plumbing:** `vercel link` (auto-connected the GitHub repo → pushes auto-deploy); set
+  `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` (prod+dev) and
+  a generated `CRON_SECRET` (prod); `vercel --prod`. **The nightly sealed-price cron is now ACTIVE**
+  (`/api/cron/sync-sealed`, daily 09:00 UTC) — verified 401 without the secret.
+- **Verified live:** home 200 (title + disclaimer + skip-link + `og:title` all present), login 200, cron
+  401, `/api/prices/search?q=booster%20box` → 12 sealed candidates from the live index.
+
+**Files.** New: `components/SiteFooter.tsx`. Changed: `app/layout.tsx` (metadata+viewport+skip-link+footer),
+`app/page.tsx` (dropped local footer, `<main>` wrap), `app/login/page.tsx` (`<main>` both branches),
+`app/games/[id]/odds/page.tsx` (`<main>` fallback), `components/odds-sheet/OddsSheetView.tsx` (`<main>`).
+Full detail + deploy facts in `docs/sprints/s5-launch.md`.
+
+**Decided.** D-033 (name = MysteryCalc), D-034 (free `.vercel.app`, Hobby, git-connected auto-deploy +
+realized env/cron/polish).
+
+**Open / next (none blocking — the product is launched).**
+1. **Supabase dashboard follow-ups (owner, optional, affects NEW-signup email only):** set Auth → URL
+   Configuration → Site URL = `https://mysterycalc.vercel.app` (+ add to Redirect allow-list) so
+   confirmation/reset emails link to production, not localhost; optionally turn OFF "Confirm email" for
+   instant signup (D-026). Everything else works live now.
+2. **Custom domain** — deferred (D-034); add via the Vercel dashboard anytime, then set
+   `NEXT_PUBLIC_SITE_URL` so `metadataBase`/OG tags use it.
+3. **Preview-env Supabase vars** — not set (CLI v54.6.1 `git_branch_required` quirk on the non-interactive
+   "all Preview branches" path); add via the dashboard if preview deploys ever need login/save.
+4. **Backlog (unchanged):** public no-login odds-sheet **share link** (share token + public-read that hides
+   cost — do NOT relax RLS on `games`/`prize_items`); Live Box Breaks model; buyer "should I play" mode.
+
+**Landmines for next session.**
+- **Git push = production deploy.** The repo is connected to Vercel, so any `origin/main` push redeploys
+  prod. Keep `main` releasable.
+- **`metadataBase` resolves from `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → localhost.** A
+  custom domain needs `NEXT_PUBLIC_SITE_URL` set in Vercel or OG/canonical URLs stay on `.vercel.app`.
+- **`CRON_SECRET` lives only in Vercel** (prod). It's auto-sent to the cron; we never need its value again.
+  To run the cron route manually you'd pass `Authorization: Bearer <secret>` — rotate by re-adding if lost.
+- **App-wide footer is `no-print`** — the customer odds sheet keeps its OWN footer; don't add a second
+  disclaimer there.
+- **Search route cache + rate limit are still in-memory only** (reset per serverless instance/redeploy) —
+  fine as a courtesy layer; revisit only if real limits are needed.

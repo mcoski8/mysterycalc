@@ -1,7 +1,17 @@
-import type { Metadata } from "next";
+// ============================================================
+// Root layout — the HTML shell wrapped around every page.
+//
+// Plain English: this sets up the fonts, the page <head> (title, social-
+// share tags, theme color), a "skip to content" link for keyboard/screen-
+// reader users, and the app-wide footer with the legal disclaimer. Each
+// page's own content is dropped in where {children} sits.
+// ============================================================
+
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +23,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// The public URL the site lives at, used to turn relative social-share image
+// paths into absolute ones. On Vercel this is provided automatically; locally
+// it falls back to localhost. GOTCHA: if a custom domain is added later, set
+// NEXT_PUBLIC_SITE_URL in the Vercel project to override this.
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
+const TITLE = `${APP_NAME} — ${APP_TAGLINE}`;
+const DESCRIPTION =
+  "A free tool for vendors to design and price mystery games — oripa, walls of sleeves, prize wheels, kuji, razzes. Solve for price, chances, or margin and see true profit and game feel.";
+
 export const metadata: Metadata = {
-  title: `${APP_NAME} — ${APP_TAGLINE}`,
-  description:
-    "A free tool for vendors to design and price mystery games — oripa, walls of sleeves, prize wheels, kuji, razzes. Solve for price, chances, or margin and see true profit and game feel.",
+  metadataBase: new URL(SITE_URL),
+  applicationName: APP_NAME,
+  title: {
+    default: TITLE,
+    // Sub-pages can set their own title; it gets "· MysteryCalc" appended.
+    template: `%s · ${APP_NAME}`,
+  },
+  description: DESCRIPTION,
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -29,7 +75,18 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {/* Skip link: invisible until a keyboard user tabs to it, then it
+            appears and jumps focus past the header straight to the content. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        >
+          Skip to content
+        </a>
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

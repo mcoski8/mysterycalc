@@ -71,11 +71,14 @@ export default async function OddsSheetPage({
 /** A simple centered message with a way back to the calculator. */
 function Problem({ message }: { message: string }) {
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
+    <main
+      id="main-content"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center"
+    >
       <p className="text-sm text-muted-foreground">{message}</p>
       <Link href="/" className={buttonVariants({ variant: "outline", size: "sm" })}>
         Back to the calculator
       </Link>
-    </div>
+    </main>
   );
 }

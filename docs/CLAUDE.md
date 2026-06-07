@@ -90,7 +90,8 @@ break-even indicator (proposed for v1). Detail lives in `docs/modules/calculatio
 - **Phase 3 — Customer Odds Sheet.** Exit: generate a printable/shareable odds sheet from a saved game.
 - **Phase 4 — Price Lookup. ✅ DONE (singles).** Exit met: search a card → market value auto-fills. Sealed via
   tcgcsv deferred to Sprint 4.5 (Decision 031).
-- **Phase 5 — Launch.** Exit: live at a real domain on Vercel, free.
+- **Phase 5 — Launch. ✅ DONE.** Exit met: live at https://mysterycalc.vercel.app (Vercel Hobby/free), git
+  auto-deploy, accessibility+SEO polish, "not affiliated" footer app-wide, sealed cron activated (Decisions 033–034).
 - **Future/deferred:** Live Box Breaks model; buyer "should I play / live odds" mode.
 
 ## Repository Layout (created as phases land — not all at once)
@@ -206,7 +207,11 @@ npm run build                # production build (must pass before deploy)
 
 ---
 
-*Last updated: 2026-06-06 (Phase 4 COMPLETE — Sprint 4.5 sealed pricing built + owner-verified. Singles via
+*Last updated: 2026-06-06 (🚀 LAUNCHED — Phase 5 complete; ALL FIVE PHASES DONE. Live at
+https://mysterycalc.vercel.app on Vercel Hobby/free, GitHub-connected auto-deploy. Final public name =
+"MysteryCalc" (Decision 033). Accessibility+SEO polish (app-wide SiteFooter disclaimer, `<main>` landmarks +
+skip-to-content link, OpenGraph/Twitter/robots/theme metadata). Nightly sealed-price cron activated via Vercel
+env vars (Decision 034). Earlier: Phase 4 COMPLETE — Sprint 4.5 sealed pricing built + owner-verified. Singles via
 pokemontcg.io (S4) + SEALED product via tcgcsv (S4.5): a nightly sync indexes 1,848 sealed products into
 Supabase, searched via a `CompositePriceSource` behind the same interface; type a card OR a booster box/ETB/pack
 → its TCGPlayer market value auto-fills a prize row. Sealed detection = field-absence, Decision 032. Graded
