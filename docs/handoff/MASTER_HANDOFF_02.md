@@ -163,3 +163,8 @@ realized env/cron/polish).
   disclaimer there.
 - **Search route cache + rate limit are still in-memory only** (reset per serverless instance/redeploy) —
   fine as a courtesy layer; revisit only if real limits are needed.
+
+---
+
+> **Closed at ~12KB. Covers Sessions 5–7** (Phase 4 price lookup, Sprint 4.5 sealed pricing, Phase 5 launch).
+> **Continued in `MASTER_HANDOFF_03.md`** (Sessions 8+).

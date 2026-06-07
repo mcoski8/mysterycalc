@@ -109,6 +109,20 @@
 - [ ] (Owner, optional) Supabase Auth Site URL → production + (optional) disable email confirmation
 - [ ] (Deferred) Preview-env Supabase vars — CLI v54.6.1 quirk; add via dashboard if preview login/save ever needed
 
+## Sprint 6 — Post-Launch UX Overhaul  *(✅ COMPLETE — Session 8, 2026-06-07)*
+- [x] Design system: violet+gold OKLCH palette (light+dark), Space Grotesk, aurora, gradients; fixed `--font-sans` bug (Decision 035)
+- [x] `/guide` field-guide page + game-type info panel (`lib/games/game-info.ts`)
+- [x] Profit goal in 3 units (% / $ / ×) — `lib/games/goal.ts` + tests (Decision 036)
+- [x] Search: raised caps + relevance ranking across sources + set-name matching — `lib/prices/relevance.ts` + tests (Decision 037)
+- [x] Dark mode via `next-themes` (system default, no FOUC); toggle in header + footer (Decision 035)
+- [x] Mobile pass: prize editor + odds table → stacked cards <sm; fixed ≤390px header overflow; "via TCGPlayer" attribution; empty state
+
+## Sprint 7 — Live Game Board  *(🔨 IN PROGRESS — data layer done Session 8; app code next. Decision 038)*
+- [x] Migration `20260607120000_live_game_board.sql` applied to remote + RLS verified (two-table public/secret split, token-checked RPCs)
+- [ ] Step 2 — Controller (phone): Start Live Board → `create_live_game`; `app/board/[code]/control` with –/+ steppers, "common pulled", panel toggles, offline banner
+- [ ] Step 3 — Display (iPad): `app/board/[code]` subscribing to `postgres_changes`, re-fetch on reconnect, four panels + "scan to watch" QR, code-entry landing
+- [ ] Step 4 — Resilience (reconnect/replay) + pure tested state-transition helpers
+
 ## Deferred / Future  *(explicitly out of current scope)*
 - [ ] ~~Claw / UFO catcher~~ — out permanently (no fixed pool of chances)
 - [ ] Live Box Breaks model (separate cost + pull-value math)

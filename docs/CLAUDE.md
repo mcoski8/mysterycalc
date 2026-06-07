@@ -45,6 +45,10 @@ Close third: the **customer-facing odds sheet** (transparency = trust).
 **In v1 — the "finite-pool" family** (one shared math model): oripa, mystery box/pack/bag, wall of
 sleeves/prize wall, mystery slab lots, prize wheel/Plinko, kuji, razz (single-winner special case).
 
+**Post-launch (in progress):** **Live Game Board** — a customer-facing iPad scoreboard for a running game
+(what's left, live odds, recent wins), controlled from the vendor's phone, synced in real time via Supabase
+(Decision 038; Sprint 7; `docs/modules/live-board.md`). Data layer applied 2026-06-07; app code in progress.
+
 **Deferred:** Live Box Breaks (random sealed contents → needs a separate cost-and-pull-value model).
 
 **Out (permanent unless re-decided):** claw / UFO catcher (no fixed pool of chances).
