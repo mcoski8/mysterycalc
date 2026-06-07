@@ -239,6 +239,9 @@ export function Calculator({ userEmail }: Props) {
       name: candidate.name,
       type: candidate.kind === "sealed" ? "sealed" : "single",
       marketValue: candidate.marketValue !== null ? String(candidate.marketValue) : "",
+      // Attribute auto-filled prices to TCGPlayer (both sources report the
+      // TCGPlayer market price). Only tag rows that actually got a value.
+      priceSource: candidate.marketValue !== null ? "TCGPlayer" : undefined,
       cost: "",
       quantity: "1",
     };

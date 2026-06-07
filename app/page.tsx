@@ -32,20 +32,22 @@ export default async function Home() {
 
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:py-12">
-      <header className="mb-10 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
+      <header className="mb-10 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-3.5">
           {/* Logo mark: a gradient tile with a sparkle — the "mystery" glint. */}
           <span className="bg-gradient-brand flex size-11 shrink-0 items-center justify-center rounded-2xl shadow-lg shadow-primary/25 ring-1 ring-white/20">
             <Sparkles className="size-6 text-white" strokeWidth={2.25} />
           </span>
-          <div>
-            <h1 className="text-gradient-brand text-3xl font-bold tracking-tight sm:text-[2rem]">
+          {/* min-w-0 + truncate let the brand block yield space on a phone so the
+              header never overflows the viewport. */}
+          <div className="min-w-0">
+            <h1 className="text-gradient-brand truncate text-2xl font-bold tracking-tight sm:text-[2rem]">
               {APP_NAME}
             </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">{APP_TAGLINE}</p>
+            <p className="mt-0.5 truncate text-sm text-muted-foreground">{APP_TAGLINE}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {/* Link to the new field guide explaining every mystery-game format. */}
           <Link
             href="/guide"

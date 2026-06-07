@@ -187,7 +187,8 @@ export function ResultsDashboard({ result, meta, lead, onLeadChange }: Props) {
           <CardTitle className="text-base">Per-prize odds</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-lg border">
+          {/* DESKTOP (sm+): the table. */}
+          <div className="hidden overflow-x-auto rounded-lg border sm:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -211,6 +212,30 @@ export function ResultsDashboard({ result, meta, lead, onLeadChange }: Props) {
               </TableBody>
             </Table>
           </div>
+
+          {/* MOBILE (<sm): one card per prize — name on top, the three numbers
+              in a labeled row, so nothing is squeezed off a phone screen. */}
+          <ul className="space-y-2 sm:hidden">
+            {result.perPrizeOdds.map((o, i) => (
+              <li key={`${o.name}-${i}`} className="rounded-lg border p-3">
+                <div className="font-medium">{o.name || "Unnamed"}</div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-sm tabular-nums">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Qty</div>
+                    {formatNumber(o.quantity)}
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Odds</div>
+                    {formatPercent(o.probability)}
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">1 in…</div>
+                    {o.probability > 0 ? formatNumber(Math.round(1 / o.probability)) : "—"}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
     </div>
