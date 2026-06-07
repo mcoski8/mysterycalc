@@ -144,7 +144,13 @@ export function CardSearch({ onPick }: Props) {
       )}
 
       {view.kind === "results" && view.candidates.length > 0 && (
-        <ul className="max-h-72 space-y-1 overflow-y-auto">
+        <>
+          <p className="text-xs text-muted-foreground">
+            {view.candidates.length} match{view.candidates.length === 1 ? "" : "es"}
+            {view.candidates.length >= 10 ? " — scroll for more" : ""}. Best
+            matches first.
+          </p>
+          <ul className="max-h-96 space-y-1 overflow-y-auto pr-1">
           {view.candidates.map((c) => (
             <li key={c.id}>
               <button
@@ -207,7 +213,8 @@ export function CardSearch({ onPick }: Props) {
               </button>
             </li>
           ))}
-        </ul>
+          </ul>
+        </>
       )}
     </div>
   );

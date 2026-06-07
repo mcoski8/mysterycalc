@@ -18,8 +18,14 @@
 
 import type { PriceCandidate, PriceQuery, PriceSource } from "@/lib/prices/types";
 import { readClient } from "@/lib/sealed/db";
+import { relevanceScore } from "@/lib/prices/relevance";
 
-const MAX_RESULTS = 12;
+// How many sealed matches to return to the UI (it scrolls). And how many to
+// pull from the DB first so we can RANK by relevance before trimming — fetching
+// a wider net than we show means the best-named match can win even if it isn't
+// the most expensive one.
+const MAX_RESULTS = 30;
+const FETCH_LIMIT = 80;
 
 /** One row as stored in sealed_products (the columns we read). */
 type SealedRow = {
@@ -75,17 +81,29 @@ export class TcgCsvPriceSource implements PriceSource {
       let q = sb
         .from("sealed_products")
         .select("product_id,name,set_name,image_url,market_price,product_type,prices_updated_at")
-        // Highest-value product first — a vendor pricing prizes usually wants
-        // the box/ETB, not a $1 single pack, near the top.
+        // Pull a wide net, highest-value first, then we re-rank by relevance in
+        // JS below and trim to MAX_RESULTS. Price-first ordering here just means
+        // that when a query has MORE than FETCH_LIMIT matches, we keep the
+        // valuable ones (boxes/ETBs) rather than $1 packs.
         .order("market_price", { ascending: false })
-        .limit(MAX_RESULTS);
+        .limit(FETCH_LIMIT);
       // AND every typed word as a case-insensitive substring of the name.
       for (const w of words) {
         q = q.ilike("name", `%${w}%`);
       }
       const { data, error } = await q;
       if (error) return [];
-      return ((data ?? []) as SealedRow[]).map(rowToCandidate);
+      const rows = (data ?? []) as SealedRow[];
+
+      // Rank best-name-match first; for equal relevance, keep the price-desc
+      // order from the DB (the array is already in that order, and the sort is
+      // stable). Then trim to what the UI shows.
+      const query = words.join(" ");
+      return rows
+        .map((r, i) => ({ r, i, score: relevanceScore(r.name, query) }))
+        .sort((a, b) => b.score - a.score || a.i - b.i)
+        .slice(0, MAX_RESULTS)
+        .map((x) => rowToCandidate(x.r));
     } catch {
       // Table missing / Supabase down / no keys → just no sealed matches.
       return [];

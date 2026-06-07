@@ -19,9 +19,12 @@
 
 import type { PriceCandidate, PriceQuery, PriceSource } from "@/lib/prices/types";
 import { rawToCandidate, type RawCard } from "@/lib/prices/extract";
+import { relevanceScore } from "@/lib/prices/relevance";
 
 const API_URL = "https://api.pokemontcg.io/v2/cards";
-const MAX_PAGE_SIZE = 12; // plenty to disambiguate; keeps payloads small.
+// Fetch a generous page so the vendor can scroll through real choices (printings,
+// art variants) — not just a handful. Still bounded to keep payloads sane.
+const MAX_PAGE_SIZE = 40;
 
 // Lucene-ish special characters the API's query language treats specially.
 // We strip them from user input so a stray quote/colon can't break the query
@@ -91,13 +94,21 @@ export class PokemonTcgPriceSource implements PriceSource {
     const cards = Array.isArray(body.data) ? body.data : [];
     const candidates = cards.map(rawToCandidate);
 
-    // Surface cards that actually HAVE a price first (the whole point is to
-    // auto-fill a value), keeping the API's newest-set-first order within each
-    // group. `sort` is stable, so same-priced cards keep their relative order.
-    return candidates.sort((a, b) => {
-      const aHas = a.marketValue !== null ? 0 : 1;
-      const bHas = b.marketValue !== null ? 0 : 1;
-      return aHas - bHas;
-    });
+    // Rank results so the BEST match for what was typed is on top. Two signals,
+    // in order: (1) how well the card name matches the query (an exact
+    // "Charizard ex" beats a long bundle that merely contains the words), then
+    // (2) cards that actually HAVE a price first, since auto-filling a value is
+    // the whole point. The API's newest-set-first order survives as the final
+    // tiebreak because `sort` is stable.
+    return candidates
+      .map((c, i) => ({ c, i, score: relevanceScore(c.name, query.name) }))
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        const aHas = a.c.marketValue !== null ? 0 : 1;
+        const bHas = b.c.marketValue !== null ? 0 : 1;
+        if (aHas !== bHas) return aHas - bHas;
+        return a.i - b.i;
+      })
+      .map((x) => x.c);
   }
 }
