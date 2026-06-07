@@ -8,10 +8,26 @@
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/configured";
 import { LoginForm } from "@/components/account/LoginForm";
 import { APP_NAME } from "@/lib/brand";
+
+/** The brand lockup (logo mark + gradient wordmark), shared by both states
+ *  of this page so the sign-in screen matches the calculator's header. */
+function BrandLockup() {
+  return (
+    <Link href="/" className="mb-6 flex items-center gap-3">
+      <span className="bg-gradient-brand flex size-10 items-center justify-center rounded-2xl shadow-lg shadow-primary/25 ring-1 ring-white/20">
+        <Sparkles className="size-5 text-white" strokeWidth={2.25} />
+      </span>
+      <span className="text-gradient-brand text-2xl font-bold tracking-tight">
+        {APP_NAME}
+      </span>
+    </Link>
+  );
+}
 
 export default async function LoginPage() {
   // Until Supabase is wired up, login can't work — show a friendly notice
@@ -22,7 +38,7 @@ export default async function LoginPage() {
         id="main-content"
         className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center"
       >
-        <h1 className="mb-3 text-2xl font-bold tracking-tight">{APP_NAME}</h1>
+        <BrandLockup />
         <p className="max-w-sm text-sm text-muted-foreground">
           Accounts aren&apos;t connected yet. The calculator still works without
           one —{" "}
@@ -47,7 +63,7 @@ export default async function LoginPage() {
       id="main-content"
       className="flex flex-1 flex-col items-center justify-center px-4 py-12"
     >
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">{APP_NAME}</h1>
+      <BrandLockup />
       <LoginForm />
     </main>
   );

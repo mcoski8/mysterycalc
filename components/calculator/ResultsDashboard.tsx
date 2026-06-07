@@ -83,29 +83,39 @@ export function ResultsDashboard({ result, meta, lead, onLeadChange }: Props) {
 
       {/* The cut, three ways. Tap one to make it the lead. */}
       <div className="grid gap-3 sm:grid-cols-3">
-        {cuts.map((c) => (
-          <button
-            key={c.key}
-            type="button"
-            onClick={() => onLeadChange(c.key)}
-            className={cn(
-              "rounded-lg border p-4 text-left transition-colors",
-              lead === c.key
-                ? "border-primary bg-primary/5 ring-1 ring-primary"
-                : "border-input hover:bg-accent",
-            )}
-          >
-            <div className="text-sm text-muted-foreground">{c.label}</div>
-            <div
+        {cuts.map((c) => {
+          const isLead = lead === c.key;
+          return (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => onLeadChange(c.key)}
               className={cn(
-                "mt-1 font-semibold tabular-nums",
-                lead === c.key ? "text-3xl" : "text-2xl",
+                "rounded-xl border p-4 text-left transition-all",
+                isLead
+                  ? "bg-gradient-brand border-transparent text-white shadow-lg shadow-primary/25"
+                  : "border-border bg-card hover:border-primary/40 hover:bg-accent/40",
               )}
             >
-              {c.value}
-            </div>
-          </button>
-        ))}
+              <div
+                className={cn(
+                  "text-sm",
+                  isLead ? "text-white/80" : "text-muted-foreground",
+                )}
+              >
+                {c.label}
+              </div>
+              <div
+                className={cn(
+                  "mt-1 font-semibold tabular-nums",
+                  isLead ? "text-3xl" : "text-2xl",
+                )}
+              >
+                {c.value}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Secondary money facts. */}
@@ -210,7 +220,7 @@ export function ResultsDashboard({ result, meta, lead, onLeadChange }: Props) {
 /** A small labeled number tile used in the secondary-facts row. */
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-lg border p-3">
+    <div className="rounded-xl border bg-muted/30 p-3 transition-colors hover:bg-muted/60">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-0.5 font-semibold tabular-nums">{value}</div>
       {hint && <div className="text-[11px] text-muted-foreground">{hint}</div>}

@@ -15,6 +15,7 @@
 
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   solveGame,
@@ -31,11 +32,12 @@ import {
   type GameResult,
   type LeadMetric,
 } from "@/lib/engine";
-import { formatUSD, formatPercent, formatNumber } from "@/lib/format";
+import { formatUSD, formatPercent, formatNumber, formatMultiple } from "@/lib/format";
 import { PrizePoolEditor, blankRow, type EditorRow } from "./PrizePoolEditor";
 import { CardSearch } from "./CardSearch";
 import type { PriceCandidate } from "@/lib/prices/types";
 import { SolverPanel } from "./SolverPanel";
+import { goalToMarginFraction, type GoalUnit } from "@/lib/games/goal";
 import { ResultsDashboard } from "./ResultsDashboard";
 import { SavedGamesBar } from "./SavedGamesBar";
 import type { CalculatorSnapshot } from "@/lib/saved-games/serialize";
@@ -76,6 +78,21 @@ function rowToItem(row: EditorRow): PrizeItem {
   };
 }
 
+/**
+ * A section heading with a gradient numbered "step" badge. Gives the three
+ * cards (set up → build pool → results) a clear, visually consistent order.
+ */
+function StepTitle({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <CardTitle className="flex items-center gap-2.5 text-base">
+      <span className="bg-gradient-brand flex size-7 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white shadow-sm shadow-primary/30">
+        {n}
+      </span>
+      {children}
+    </CardTitle>
+  );
+}
+
 // The calculator can show a "save your games" bar; it needs to know who is
 // logged in. The page passes the vendor's email (or null) down from the server.
 type Props = {
@@ -88,7 +105,12 @@ export function Calculator({ userEmail }: Props) {
   const [solveFor, setSolveFor] = useState<SolveFor>("targetMargin");
   const [buyIn, setBuyIn] = useState("20");
   const [chances, setChances] = useState("100");
-  const [marginPct, setMarginPct] = useState("35");
+  // The profit goal, and which unit the vendor is expressing it in. The
+  // value is whatever that unit means ("35" = 35% margin, "1500" = $1,500
+  // profit, "3" = triple your money). The engine only understands margin, so
+  // we convert below — see goalMarginFraction.
+  const [goalUnit, setGoalUnit] = useState<GoalUnit>("margin");
+  const [goalValue, setGoalValue] = useState("35");
   // Which "cut" reading leads on the dashboard (Decision 005). Lifted here
   // so it saves and reopens with a game.
   const [leadMetric, setLeadMetric] = useState<LeadMetric>("percent");
@@ -115,6 +137,18 @@ export function Calculator({ userEmail }: Props) {
   // until after the solve).
   const targetChances = solveFor !== "chances" && provided(chances) ? Math.round(num(chances)) : null;
 
+  // Convert the profit goal (in whatever unit the vendor picked — %, $, or ×)
+  // into the single "margin fraction" the engine works in. The translation
+  // itself is a pure, tested helper (lib/games/goal.ts); here we just feed it
+  // the live pool totals. `null` means "not enough input yet."
+  const goalMarginFraction = useMemo<number | null>(
+    () =>
+      provided(goalValue)
+        ? goalToMarginFraction(goalUnit, num(goalValue), totals.value, totals.cost)
+        : null,
+    [goalValue, goalUnit, totals.cost, totals.value],
+  );
+
   // Run the engine. We compute a discriminated result so the view can
   // show a friendly "needs more input" state, a real error, or the
   // dashboard — never a half-baked number.
@@ -130,7 +164,7 @@ export function Calculator({ userEmail }: Props) {
     const haveInputs =
       (!needsBuyIn || provided(buyIn)) &&
       (!needsChances || provided(chances)) &&
-      (!needsMargin || provided(marginPct));
+      (!needsMargin || goalMarginFraction !== null);
     if (totals.count <= 0 || !haveInputs) return { kind: "incomplete" };
 
     const config: GameConfig = {
@@ -138,8 +172,9 @@ export function Calculator({ userEmail }: Props) {
       solveFor,
       buyIn: needsBuyIn ? num(buyIn) : undefined,
       chances: needsChances ? Math.round(num(chances)) : undefined,
-      // Margin is entered as a percentage; the engine wants a fraction.
-      targetMargin: needsMargin ? num(marginPct) / 100 : undefined,
+      // The profit goal was already converted to a margin fraction above,
+      // whatever unit the vendor typed it in.
+      targetMargin: needsMargin ? goalMarginFraction! : undefined,
     };
 
     try {
@@ -150,16 +185,22 @@ export function Calculator({ userEmail }: Props) {
         e instanceof EngineError ? e.message : "Something went wrong calculating this game.";
       return { kind: "error", message };
     }
-  }, [items, totals.count, gameType, solveFor, buyIn, chances, marginPct]);
+  }, [items, totals.count, gameType, solveFor, buyIn, chances, goalMarginFraction]);
 
-  // What to show in the read-only "solved" field of the solver panel.
+  // What to show in the read-only "solved" field of the solver panel. When
+  // solving for the profit goal we show it in whichever unit the vendor chose
+  // (margin %, total $ profit, or money multiple) — same number, their words.
   const solvedDisplay =
     outcome.kind === "ok"
       ? solveFor === "buyIn"
         ? formatUSD(outcome.result.buyIn)
         : solveFor === "chances"
           ? `${formatNumber(outcome.result.chances)} ${meta.chanceWordPlural}`
-          : formatPercent(outcome.result.marginPct)
+          : goalUnit === "profit"
+            ? formatUSD(outcome.result.profit)
+            : goalUnit === "multiple"
+              ? formatMultiple(outcome.result.poolMultiple)
+              : formatPercent(outcome.result.marginPct)
       : null;
 
   // One-click filler balance: size a single filler line so the prize
@@ -204,10 +245,10 @@ export function Calculator({ userEmail }: Props) {
     setRows((prev) => [...prev, row]);
   }
 
-  function handleInputChange(field: "buyIn" | "chances" | "marginPct", value: string) {
+  function handleInputChange(field: "buyIn" | "chances" | "goalValue", value: string) {
     if (field === "buyIn") setBuyIn(value);
     else if (field === "chances") setChances(value);
-    else setMarginPct(value);
+    else setGoalValue(value);
   }
 
   // When switching to razz, drop the every-chance-wins filler flag from
@@ -219,18 +260,37 @@ export function Calculator({ userEmail }: Props) {
 
   // A snapshot of everything a saved game needs, kept in sync with the
   // inputs so the SavedGamesBar can save it at any moment.
+  // The saved-game format stores the goal as a margin PERCENT string (and
+  // blank when solving for it — the engine recomputes it). So we hand the
+  // snapshot the EFFECTIVE margin percent, converted from whatever unit the
+  // vendor used, keeping the on-disk shape unchanged. GOTCHA: the chosen unit
+  // (%/$/×) itself isn't persisted — a reopened game shows its goal as a
+  // margin %, which is the same economics.
   const snapshot = useMemo<CalculatorSnapshot>(
-    () => ({ gameType, solveFor, buyIn, chances, marginPct, rows, leadMetric }),
-    [gameType, solveFor, buyIn, chances, marginPct, rows, leadMetric],
+    () => ({
+      gameType,
+      solveFor,
+      buyIn,
+      chances,
+      marginPct:
+        solveFor === "targetMargin" || goalMarginFraction === null
+          ? ""
+          : String(goalMarginFraction * 100),
+      rows,
+      leadMetric,
+    }),
+    [gameType, solveFor, buyIn, chances, goalMarginFraction, rows, leadMetric],
   );
 
-  // Reopen a saved game: push every field back into the editor at once.
+  // Reopen a saved game: push every field back into the editor at once. The
+  // stored goal is a margin percent, so we restore the unit toggle to "%".
   function applySnapshot(s: CalculatorSnapshot) {
     setGameType(s.gameType);
     setSolveFor(s.solveFor);
     setBuyIn(s.buyIn);
     setChances(s.chances);
-    setMarginPct(s.marginPct);
+    setGoalUnit("margin");
+    setGoalValue(s.marginPct);
     setRows(s.rows);
     setLeadMetric(s.leadMetric);
   }
@@ -244,7 +304,7 @@ export function Calculator({ userEmail }: Props) {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">1. Set up the game</CardTitle>
+            <StepTitle n={1}>Set up the game</StepTitle>
           </CardHeader>
           <CardContent>
             <SolverPanel
@@ -255,7 +315,9 @@ export function Calculator({ userEmail }: Props) {
               onSolveForChange={setSolveFor}
               buyIn={buyIn}
               chances={chances}
-              marginPct={marginPct}
+              goalValue={goalValue}
+              goalUnit={goalUnit}
+              onGoalUnitChange={setGoalUnit}
               onInputChange={handleInputChange}
               solvedDisplay={solvedDisplay}
             />
@@ -264,7 +326,7 @@ export function Calculator({ userEmail }: Props) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">2. Build the prize pool</CardTitle>
+            <StepTitle n={2}>Build the prize pool</StepTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <CardSearch onPick={handleAddFromCard} />
@@ -284,10 +346,10 @@ export function Calculator({ userEmail }: Props) {
       </div>
 
       {/* RIGHT: results */}
-      <div className="space-y-6">
+      <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">3. Results</CardTitle>
+            <StepTitle n={3}>Results</StepTitle>
           </CardHeader>
           <CardContent>
             {outcome.kind === "ok" ? (
@@ -298,13 +360,19 @@ export function Calculator({ userEmail }: Props) {
                 onLeadChange={setLeadMetric}
               />
             ) : outcome.kind === "error" ? (
-              <p className="rounded-md border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-100">
+              <p className="rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-100">
                 {outcome.message}
               </p>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                Add at least one prize and fill in the two values above to see your results.
-              </p>
+              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-muted/30 px-6 py-14 text-center">
+                <span className="bg-gradient-brand flex size-12 items-center justify-center rounded-2xl opacity-90 shadow-md shadow-primary/20">
+                  <Sparkles className="size-6 text-white" strokeWidth={2.25} />
+                </span>
+                <p className="max-w-xs text-sm text-muted-foreground">
+                  Add at least one prize and fill in the two values above to see
+                  your profit, hit rate, and per-prize odds.
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

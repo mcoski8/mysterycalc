@@ -7,9 +7,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  /* GOTCHA: previously `--font-sans: var(--font-sans)` was self-referential,
+     so Geist never actually applied and the body fell back to system-ui.
+     These now point at the real font variables wired up in layout.tsx. */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-heading: var(--font-display), var(--font-geist-sans), sans-serif;
+  /* Warm gold accent — the second half of the brand (violet + gold). Used
+     for highlight gradients, the wordmark, and the leading result tile. */
+  --color-gold: var(--gold);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,73 +54,90 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ------------------------------------------------------------
+   Brand palette (light). Plain English: the whole app's colors come
+   from these few tokens, so re-theming is a one-place change. The
+   identity is "premium mystery box": a rich violet-indigo primary
+   paired with a warm gold accent, sitting on a faintly lavender-tinted
+   off-white (not stark white) so cards feel like they float. Tier
+   colors elsewhere — amber "chase", emerald "win" — were chosen to sit
+   inside this same family. Colors use OKLCH (lightness, chroma, hue)
+   so the violet→gold ramp stays perceptually even.
+   ------------------------------------------------------------ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.985 0.005 286);
+  --foreground: oklch(0.22 0.03 280);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.22 0.03 280);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.22 0.03 280);
+  --primary: oklch(0.53 0.21 285);
+  --primary-foreground: oklch(0.99 0.005 285);
+  --secondary: oklch(0.96 0.015 286);
+  --secondary-foreground: oklch(0.34 0.09 285);
+  --muted: oklch(0.965 0.008 286);
+  --muted-foreground: oklch(0.52 0.025 285);
+  --accent: oklch(0.95 0.03 290);
+  --accent-foreground: oklch(0.37 0.12 286);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: oklch(0.91 0.012 286);
+  --input: oklch(0.91 0.012 286);
+  --ring: oklch(0.53 0.21 285);
+  /* Warm gold — the accent half of the brand. */
+  --gold: oklch(0.8 0.13 80);
+  /* Chart ramp sweeps violet → magenta → gold. */
+  --chart-1: oklch(0.53 0.21 285);
+  --chart-2: oklch(0.62 0.19 300);
+  --chart-3: oklch(0.7 0.16 330);
+  --chart-4: oklch(0.78 0.14 60);
+  --chart-5: oklch(0.82 0.13 90);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.985 0.005 286);
+  --sidebar-foreground: oklch(0.22 0.03 280);
+  --sidebar-primary: oklch(0.53 0.21 285);
+  --sidebar-primary-foreground: oklch(0.99 0.005 285);
+  --sidebar-accent: oklch(0.95 0.03 290);
+  --sidebar-accent-foreground: oklch(0.37 0.12 286);
+  --sidebar-border: oklch(0.91 0.012 286);
+  --sidebar-ring: oklch(0.53 0.21 285);
 }
 
+/* Dark theme — a deep indigo-black night-sky variant of the same
+   violet + gold identity. Primary brightens so it reads on dark; gold
+   stays warm for highlights. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.18 0.022 285);
+  --foreground: oklch(0.95 0.01 286);
+  --card: oklch(0.225 0.026 285);
+  --card-foreground: oklch(0.95 0.01 286);
+  --popover: oklch(0.225 0.026 285);
+  --popover-foreground: oklch(0.95 0.01 286);
+  --primary: oklch(0.7 0.17 290);
+  --primary-foreground: oklch(0.18 0.03 285);
+  --secondary: oklch(0.29 0.03 285);
+  --secondary-foreground: oklch(0.95 0.01 286);
+  --muted: oklch(0.27 0.025 285);
+  --muted-foreground: oklch(0.73 0.03 286);
+  --accent: oklch(0.33 0.05 290);
+  --accent-foreground: oklch(0.95 0.01 286);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --ring: oklch(0.7 0.17 290);
+  --gold: oklch(0.83 0.13 82);
+  --chart-1: oklch(0.7 0.17 290);
+  --chart-2: oklch(0.68 0.18 320);
+  --chart-3: oklch(0.74 0.16 350);
+  --chart-4: oklch(0.8 0.14 60);
+  --chart-5: oklch(0.84 0.13 90);
+  --sidebar: oklch(0.225 0.026 285);
+  --sidebar-foreground: oklch(0.95 0.01 286);
+  --sidebar-primary: oklch(0.7 0.17 290);
+  --sidebar-primary-foreground: oklch(0.18 0.03 285);
+  --sidebar-accent: oklch(0.33 0.05 290);
+  --sidebar-accent-foreground: oklch(0.95 0.01 286);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.7 0.17 290);
 }
 
 @layer base {
@@ -123,9 +146,74 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Crisper text rendering for the lighter weights used across the UI. */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;
+  }
+  /* Headings and the wordmark use the display font + tighter tracking. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ------------------------------------------------------------
+   Brand decoration — reusable visual flourishes that lean on the
+   palette tokens above so they re-theme automatically.
+   ------------------------------------------------------------ */
+@layer utilities {
+  /* Gradient text for the wordmark (violet → magenta → gold). */
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      105deg,
+      var(--primary) 0%,
+      oklch(0.62 0.2 320) 45%,
+      var(--gold) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Solid violet→gold gradient fill, for logo marks and the lead tile. */
+  .bg-gradient-brand {
+    background-image: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      oklch(0.6 0.2 318) 55%,
+      var(--gold) 115%
+    );
+  }
+
+  /* Aurora — two soft colored glows fixed behind the whole page, giving
+     the flat background subtle depth without distracting from content.
+     Tagged via the .aurora element in the layout so it can be no-print. */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        42rem 42rem at 12% -8%,
+        oklch(0.6 0.2 290 / 0.18),
+        transparent 60%
+      ),
+      radial-gradient(
+        38rem 38rem at 100% 8%,
+        oklch(0.8 0.14 70 / 0.14),
+        transparent 55%
+      ),
+      radial-gradient(
+        50rem 30rem at 50% 110%,
+        oklch(0.62 0.18 320 / 0.1),
+        transparent 60%
+      );
   }
 }
 

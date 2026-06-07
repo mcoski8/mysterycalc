@@ -8,19 +8,29 @@
 // ============================================================
 
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
 
+// Body text — Geist (clean, neutral, great at small sizes).
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
+// Numbers and monospaced bits.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Display font — Space Grotesk gives the wordmark and section headings a
+// distinctive, slightly technical character that pairs with Geist's neutrality.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 // The public URL the site lives at, used to turn relative social-share image
@@ -62,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#f6f5fb",
 };
 
 export default function RootLayout({
@@ -73,9 +83,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Decorative aurora glow behind everything (no-print, non-interactive). */}
+        <div className="aurora no-print" aria-hidden="true" />
         {/* Skip link: invisible until a keyboard user tabs to it, then it
             appears and jumps focus past the header straight to the content. */}
         <a
