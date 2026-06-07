@@ -42,6 +42,7 @@ import { ResultsDashboard } from "./ResultsDashboard";
 import { SavedGamesBar } from "./SavedGamesBar";
 import type { CalculatorSnapshot } from "@/lib/saved-games/serialize";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StartLiveBoard } from "@/components/live-board/StartLiveBoard";
 
 // ---- Seed data: the official worked example, so the page reproduces
 // the 41% acceptance result the moment it loads (and gives the vendor a
@@ -381,6 +382,18 @@ export function Calculator({ userEmail }: Props) {
         </Card>
       </div>
       </div>
+
+      {/* Once a game is solved, offer to run it live as a customer-facing
+          iPad scoreboard (Sprint 7). Only shown when there's a real result —
+          a live board needs a settled chance count and buy-in. */}
+      {outcome.kind === "ok" && (
+        <StartLiveBoard
+          items={items}
+          gameType={gameType}
+          meta={meta}
+          result={outcome.result}
+        />
+      )}
     </div>
   );
 }

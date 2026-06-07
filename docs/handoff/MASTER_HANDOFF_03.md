@@ -63,3 +63,39 @@ ranking + set-name), **038** (Live Game Board feature + architecture). See `DECI
   table is dormant in production — safe.
 - Supabase CLI is linked; `supabase db push` applies migrations (init, sealed, live_game_board all applied;
   `supabase migration list` shows all three synced).
+
+---
+
+## Session 9 — 2026-06-07 — Live Game Board app (Sprint 7 complete)
+
+**Accomplished — built the entire app on top of Session 8's verified data layer (migration untouched):**
+- **Pure, tested logic** in `lib/live-board/`: `types.ts`, `state.ts` (markWon/undoWon/togglePanel/initialState —
+  floors at 0, caps at start qty, filler kept out of the wins ticker, ticker capped at 50), `odds.ts`
+  (countLeft/liveOdds/chasePrizesLeft/prizesRemaining, all recomputed from remaining — stored odds never trusted),
+  `code.ts` (normalizeCode/isCompleteCode), `client.ts` (RPC wrappers + localStorage token helpers).
+- **UI** in `components/live-board/`: `StartLiveBoard` (calculator → create board), `BoardController` (phone:
+  steppers, common-pulled, panel toggles, offline banner, end), `BoardDisplay` (iPad: realtime, 4 panels,
+  animated counts, QR), `JoinBoardForm` (code entry), `WatchQR` (qrcode.react SVG), `AnimatedNumber`.
+- **Routes**: `app/board/page.tsx`, `app/board/[code]/page.tsx`, `app/board/[code]/control/page.tsx`. Wired
+  `StartLiveBoard` into `components/calculator/Calculator.tsx` (renders only when a game is solved).
+- **Tests**: `tests/live-board.test.ts` (18). Suite 70 → 88, all green.
+
+**Decided:** Decision 039 — adopt `qrcode.react@^4.2.0` (MIT, inline SVG, offline) for the watch QR; it only ever
+encodes the public display URL, never the token. In scope for Decision 038, so no new scope.
+
+**Verified myself (not asked of the owner):** typecheck / lint / 88 tests / build all green. Live RPC round-trip
+on the remote project (anon key): create returns code+token; public read leaks no token/hash; update needs the
+right token (wrong → "invalid control token"); end deletes. Realtime `postgres_changes` (INSERT/UPDATE/DELETE)
+delivered, including with the `id=eq.<id>` filter. 0 test rows left behind.
+
+**Open / next:** Sprint 7 is done. Nothing required to ship — the routes are live on next push (prod auto-deploy).
+Possible future polish (not committed): board auto-expiry/cleanup cron; a "my live boards" list; richer razz
+semantics; optional realtime catch-up read on first subscribe (currently relies on whole-state self-heal).
+
+**Landmines for next session:**
+- The sub-second `.subscribe()`→SUBSCRIBED binding window can drop one update; harmless due to whole-state writes
+  (next event re-syncs). Don't "fix" it by switching to event/delta writes — that would reintroduce replay bugs.
+- React 19 `react-hooks/set-state-in-effect` trips on client-only inits (window.origin, navigator.onLine) —
+  one-line eslint-disable, same as the `next-themes` mounted flag.
+- `display_config` (panels + title) rides in the same row as state, so phone toggles reach the iPad live.
+- Pre-existing `npm audit` items (postcss, vitest, breaking-change fixes) are unrelated — left alone.

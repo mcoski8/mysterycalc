@@ -117,11 +117,12 @@
 - [x] Dark mode via `next-themes` (system default, no FOUC); toggle in header + footer (Decision 035)
 - [x] Mobile pass: prize editor + odds table → stacked cards <sm; fixed ≤390px header overflow; "via TCGPlayer" attribution; empty state
 
-## Sprint 7 — Live Game Board  *(🔨 IN PROGRESS — data layer done Session 8; app code next. Decision 038)*
+## Sprint 7 — Live Game Board  *(✅ COMPLETE — data layer Session 8; app Session 9. Decisions 038–039)*
 - [x] Migration `20260607120000_live_game_board.sql` applied to remote + RLS verified (two-table public/secret split, token-checked RPCs)
-- [ ] Step 2 — Controller (phone): Start Live Board → `create_live_game`; `app/board/[code]/control` with –/+ steppers, "common pulled", panel toggles, offline banner
-- [ ] Step 3 — Display (iPad): `app/board/[code]` subscribing to `postgres_changes`, re-fetch on reconnect, four panels + "scan to watch" QR, code-entry landing
-- [ ] Step 4 — Resilience (reconnect/replay) + pure tested state-transition helpers
+- [x] Step 2 — Controller (phone): `StartLiveBoard` → `create_live_game` (token to localStorage); `app/board/[code]/control` → `BoardController` with Mark-won/Undo steppers, "common pulled", panel toggles, offline banner, end-board
+- [x] Step 3 — Display (iPad): `app/board/[code]` → `BoardDisplay` subscribing to `postgres_changes` (re-fetch on reconnect), four toggle-driven panels + animated counts + "scan to watch" QR (`qrcode.react`); code-entry landing `app/board/page.tsx` → `JoinBoardForm`
+- [x] Step 4 — Resilience (whole-state writes self-heal; reconnect catch-up) + 18 pure-logic tests (`tests/live-board.test.ts`)
+- [x] Verified: typecheck/lint/88 tests/build green; live RPC round-trip (token enforcement + no secret leak) + Realtime delivery confirmed against remote
 
 ## Deferred / Future  *(explicitly out of current scope)*
 - [ ] ~~Claw / UFO catcher~~ — out permanently (no fixed pool of chances)

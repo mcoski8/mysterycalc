@@ -16,7 +16,7 @@
 | S4.5 | Sealed-product pricing (tcgcsv) | Phase 4: Price data | **Complete** (nightly sync/index into Supabase; 1,848 sealed products searchable; composite source; owner-verified. Cron activates at Phase 5 deploy. Decisions 031–032) | 2026-06-06 | 2026-06-06 |
 | S5 | Launch | Phase 5: Launch | **Complete** (live at https://mysterycalc.vercel.app — Vercel Hobby/free; accessibility+SEO polish; git auto-deploy; sealed cron activated. Decisions 033–034) | 2026-06-06 | 2026-06-06 |
 | S6 | Post-Launch UX Overhaul | Post-launch | **Complete** (design system + dark mode, `/guide` page, profit-goal %/$/× units, search relevance + set-name matching, mobile card layouts. Decisions 035–037) | 2026-06-07 | 2026-06-07 |
-| S7 | Live Game Board | New feature (post-launch) | **In Progress** (data layer DONE + verified — `live_games`/`live_game_secrets` + token-checked RPCs applied to remote; controller + display app code next. Decision 038) | 2026-06-07 | — |
+| S7 | Live Game Board | New feature (post-launch) | **Complete** (full app: phone controller + iPad realtime display + "scan to watch" QR + 18 pure-logic tests; data layer + RPC token-enforcement + Realtime delivery verified against remote. Decisions 038–039) | 2026-06-07 | 2026-06-07 |
 
 ## Phase → Exit Criterion (the gate to advance)
 
