@@ -33,9 +33,11 @@ const SPECIAL_CHARS = /[+\-&|!(){}[\]^"~*?:\\/]/g;
 
 /**
  * Build the API query string from the typed name. We split into words and
- * wildcard-match each (`name:*char* name:*ex*`) so partial, multi-word names
- * ("char ex") still match — the API ANDs the terms. Returns "" if nothing
- * usable is left after cleaning (the source then returns no results).
+ * wildcard-match each against the card name OR its set name
+ * (`(name:*char* OR set.name:*char*)`), so typing "charizard paldean" finds
+ * the "Charizard ex" card from the "Paldean Fates" set even though "paldean"
+ * isn't in the card's name. The API ANDs the per-word groups together. Returns
+ * "" if nothing usable is left after cleaning (the source returns no results).
  */
 function buildNameQuery(name: string): string {
   const tokens = name
@@ -44,7 +46,7 @@ function buildNameQuery(name: string): string {
     .map((t) => t.trim())
     .filter(Boolean);
   if (tokens.length === 0) return "";
-  return tokens.map((t) => `name:*${t}*`).join(" ");
+  return tokens.map((t) => `(name:*${t}* OR set.name:*${t}*)`).join(" ");
 }
 
 export class PokemonTcgPriceSource implements PriceSource {
@@ -101,7 +103,7 @@ export class PokemonTcgPriceSource implements PriceSource {
     // the whole point. The API's newest-set-first order survives as the final
     // tiebreak because `sort` is stable.
     return candidates
-      .map((c, i) => ({ c, i, score: relevanceScore(c.name, query.name) }))
+      .map((c, i) => ({ c, i, score: relevanceScore(c.name, query.name, c.setName) }))
       .sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
         const aHas = a.c.marketValue !== null ? 0 : 1;

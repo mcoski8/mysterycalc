@@ -23,30 +23,43 @@ function normalize(s: string): string {
 /**
  * Score how well `name` matches `query` (both free text). Returns a number
  * where bigger is more relevant; 0 means no typed word appears at all.
+ *
+ * `extra` is secondary text (e.g. a card's SET name) that also counts toward
+ * the match, but at a lower weight than the name — so typing "charizard
+ * paldean" finds the "Charizard ex" card from the "Paldean Fates" set, while
+ * a card whose NAME contains both words still ranks higher.
  */
-export function relevanceScore(name: string, query: string): number {
+export function relevanceScore(name: string, query: string, extra = ""): number {
   const n = normalize(name);
   const q = normalize(query);
   if (!n || !q) return 0;
 
-  // Exact and prefix matches are the strongest signals.
+  // Exact and prefix matches on the NAME are the strongest signals.
   if (n === q) return 1000;
   if (n.startsWith(q)) return 700;
 
   let score = 0;
 
-  // The whole query appearing as one run (anywhere) is a strong signal.
+  // The whole query appearing as one run in the name is a strong signal.
   if (n.includes(q)) score += 300;
 
-  // Each typed word that appears earns points; appearing at the START of a
-  // word ("char" in "charizard") counts for more than mid-word.
+  // The combined haystack (name + set) lets a word match the set when it isn't
+  // in the name — but a name match is always worth more than a set match.
+  const ex = normalize(extra);
   const words = q.split(" ").filter(Boolean);
   for (const w of words) {
-    const idx = n.indexOf(w);
-    if (idx === -1) continue; // this word isn't present at all
-    score += 40;
-    const atWordStart = idx === 0 || n[idx - 1] === " ";
-    if (atWordStart) score += 25;
+    const nameIdx = n.indexOf(w);
+    if (nameIdx !== -1) {
+      // Found in the name: full points, with a bonus at a word boundary.
+      score += 40;
+      if (nameIdx === 0 || n[nameIdx - 1] === " ") score += 25;
+      continue;
+    }
+    // Not in the name — fall back to the set name at reduced weight.
+    const exIdx = ex.indexOf(w);
+    if (exIdx === -1) continue; // word appears nowhere
+    score += 20;
+    if (exIdx === 0 || ex[exIdx - 1] === " ") score += 12;
   }
 
   // No typed word appeared at all → genuinely not a match. Return exactly 0

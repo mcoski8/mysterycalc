@@ -55,7 +55,7 @@ export class CompositePriceSource implements PriceSource {
       result.value.forEach((candidate, pos) => {
         scored.push({
           candidate,
-          score: relevanceScore(candidate.name, query.name),
+          score: relevanceScore(candidate.name, query.name, candidate.setName),
           sourceIndex,
           pos,
         });

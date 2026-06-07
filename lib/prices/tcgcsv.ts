@@ -72,7 +72,9 @@ export class TcgCsvPriceSource implements PriceSource {
   async search(query: PriceQuery): Promise<PriceCandidate[]> {
     const words = query.name
       .split(/\s+/)
-      .map((w) => w.trim())
+      // Strip characters that would break PostgREST's `.or()` filter syntax
+      // (it uses commas to separate conditions and parens to group).
+      .map((w) => w.trim().replace(/[(),]/g, ""))
       .filter(Boolean);
     if (words.length === 0) return [];
 
@@ -87,9 +89,12 @@ export class TcgCsvPriceSource implements PriceSource {
         // valuable ones (boxes/ETBs) rather than $1 packs.
         .order("market_price", { ascending: false })
         .limit(FETCH_LIMIT);
-      // AND every typed word as a case-insensitive substring of the name.
+      // AND every typed word, each matching the product NAME or its SET name
+      // (so "charizard paldean" finds a Paldean-Fates Charizard product even if
+      // "paldean" is only in the set). Within a word it's name-OR-set; the
+      // words AND together.
       for (const w of words) {
-        q = q.ilike("name", `%${w}%`);
+        q = q.or(`name.ilike.%${w}%,set_name.ilike.%${w}%`);
       }
       const { data, error } = await q;
       if (error) return [];
@@ -100,7 +105,7 @@ export class TcgCsvPriceSource implements PriceSource {
       // stable). Then trim to what the UI shows.
       const query = words.join(" ");
       return rows
-        .map((r, i) => ({ r, i, score: relevanceScore(r.name, query) }))
+        .map((r, i) => ({ r, i, score: relevanceScore(r.name, query, r.set_name ?? "") }))
         .sort((a, b) => b.score - a.score || a.i - b.i)
         .slice(0, MAX_RESULTS)
         .map((x) => rowToCandidate(x.r));

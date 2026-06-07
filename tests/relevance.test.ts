@@ -42,6 +42,19 @@ describe("relevanceScore", () => {
     const long = relevanceScore("Mew ex Super Premium Ultra Collection Bundle", "mew ex");
     expect(short).toBeGreaterThan(long);
   });
+
+  it("matches a word against the set name (extra), at lower weight than the name", () => {
+    // "charizard paldean": "charizard" is the card name, "paldean" the set.
+    const viaSet = relevanceScore("Charizard ex", "charizard paldean", "Paldean Fates");
+    expect(viaSet).toBeGreaterThan(0); // the set word counts → it's a match
+
+    // A card whose NAME carries both words still outranks the set-only match.
+    const viaName = relevanceScore("Charizard Paldean Promo", "charizard paldean", "Some Set");
+    expect(viaName).toBeGreaterThan(viaSet);
+
+    // A word in neither name nor set still doesn't match.
+    expect(relevanceScore("Pikachu V", "charizard paldean", "Base Set")).toBe(0);
+  });
 });
 
 describe("sortByRelevance", () => {
