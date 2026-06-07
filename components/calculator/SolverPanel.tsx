@@ -141,7 +141,9 @@ export function SolverPanel({
       {/* Solve-for toggle */}
       <div className="space-y-2">
         <Label>Solve for</Label>
-        <div className="grid grid-cols-3 gap-2">
+        {/* Stack on phones (the labels don't fit three-up at ~390px), three
+            across from sm up. */}
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {KNOBS.map((knob) => (
             <button
               key={knob.key}

@@ -12,6 +12,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 import { SiteFooter } from "@/components/SiteFooter";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 // Body text — Geist (clean, neutral, great at small sizes).
 const geistSans = Geist({
@@ -72,7 +73,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f5fb",
+  // Tint the mobile browser chrome to match each theme's page background.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f5fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#16161f" },
+  ],
 };
 
 export default function RootLayout({
@@ -83,21 +88,31 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // next-themes sets class="dark" on <html> before paint; the server can't
+      // know the saved theme, so we suppress the expected one-attribute mismatch.
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {/* Decorative aurora glow behind everything (no-print, non-interactive). */}
-        <div className="aurora no-print" aria-hidden="true" />
-        {/* Skip link: invisible until a keyboard user tabs to it, then it
-            appears and jumps focus past the header straight to the content. */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          Skip to content
-        </a>
-        {children}
-        <SiteFooter />
+          {/* Decorative aurora glow behind everything (no-print, non-interactive). */}
+          <div className="aurora no-print" aria-hidden="true" />
+          {/* Skip link: invisible until a keyboard user tabs to it, then it
+              appears and jumps focus past the header straight to the content. */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+          >
+            Skip to content
+          </a>
+          {children}
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -15,16 +15,20 @@
 // ============================================================
 
 import { APP_NAME } from "@/lib/brand";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function SiteFooter() {
   return (
     <footer className="no-print border-t">
-      <div className="mx-auto w-full max-w-6xl px-4 py-6 text-xs text-muted-foreground sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl items-start justify-between gap-4 px-4 py-6 text-xs text-muted-foreground sm:px-6">
         <p>
           {APP_NAME} is a planning tool for game economics. It does math and
           disclosure only — it doesn&apos;t run games or process payments. Not
           affiliated with Nintendo, The Pokémon Company, or any rights holder.
         </p>
+        {/* Theme toggle here too, so it's reachable on the guide & login pages
+            (which don't carry the calculator header). */}
+        <ThemeToggle className="-mt-1.5 shrink-0" />
       </div>
     </footer>
   );

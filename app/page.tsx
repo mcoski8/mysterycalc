@@ -11,6 +11,7 @@
 import Link from "next/link";
 import { BookOpen, Sparkles } from "lucide-react";
 import { Calculator } from "@/components/calculator/Calculator";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AccountMenu } from "@/components/account/AccountMenu";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/configured";
@@ -44,7 +45,7 @@ export default async function Home() {
             <p className="mt-0.5 text-sm text-muted-foreground">{APP_TAGLINE}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2">
           {/* Link to the new field guide explaining every mystery-game format. */}
           <Link
             href="/guide"
@@ -53,6 +54,7 @@ export default async function Home() {
             <BookOpen className="size-4" />
             <span className="hidden sm:inline">Game guide</span>
           </Link>
+          <ThemeToggle />
           <AccountMenu userEmail={userEmail} />
         </div>
       </header>
