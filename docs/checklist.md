@@ -123,6 +123,7 @@
 - [x] Step 3 — Display (iPad): `app/board/[code]` → `BoardDisplay` subscribing to `postgres_changes` (re-fetch on reconnect), four toggle-driven panels + animated counts + "scan to watch" QR (`qrcode.react`); code-entry landing `app/board/page.tsx` → `JoinBoardForm`
 - [x] Step 4 — Resilience (whole-state writes self-heal; reconnect catch-up) + 18 pure-logic tests (`tests/live-board.test.ts`)
 - [x] Verified: typecheck/lint/88 tests/build green; live RPC round-trip (token enforcement + no secret leak) + Realtime delivery confirmed against remote
+- [x] **Owner live walk-through (Session 10, 2026-06-08):** phone controller + Mac-mini-monitor display against prod; real-time sync verified on real devices — "works really well." Board owner-verified live.
 
 ## Deferred / Future  *(explicitly out of current scope)*
 - [ ] ~~Claw / UFO catcher~~ — out permanently (no fixed pool of chances)

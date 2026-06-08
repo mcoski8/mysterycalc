@@ -117,3 +117,30 @@
 - `display_config.title` and the chosen panels travel in the same row as state, so toggling on the phone
   updates the iPad live.
 - Pre-existing `npm audit` items (postcss, vitest) are unrelated to this work; not touched.
+
+### Session 10 — 2026-06-08 — Owner live walk-through (board verified on real devices)
+**Goal of the session:** the one open Sprint-7 item — a real, owner-driven walk-through of the board (not just
+plumbing verification). No code was written; this was a verification + clean-shutdown session.
+
+**What we did:**
+- **Live walk-through against prod** (https://mysterycalc.vercel.app), real-device setup: the owner's **phone
+  as the controller** and the **Mac mini's monitor as the customer display** (standing in for the iPad —
+  identical role, just a browser window on a big screen). Built a game on the phone → "Start live board" →
+  entered the pairing code on the monitor → marked wins on the phone.
+- **Result: works really well** (owner's words). The full real-time loop — phone control → Supabase → big-screen
+  display — updated within ~a second, no refresh. No UX rough edges surfaced on either the phone controller or
+  the big display. **Board is now owner-verified live, not just plumbing-verified.**
+- **Pre-flight de-risk before the walk-through:** ran a fresh anon-key RPC round-trip against the *prod* Supabase
+  to confirm the live path before sending the owner tapping around: `create_live_game` → code + 36-char token;
+  public read leaks no token/hash; **secrets table → 401 permission denied**; update with a **wrong token → 400
+  "invalid control token"**, with the right token → 204 + state persisted; `end_live_game` → 204. Throwaway test
+  board cleaned up (0 leftover rows). Confirmed `/board` serves 200 in prod.
+
+**Gotcha worth keeping:** the `live_games_game_type_chk` constraint only accepts the engine's exact `GameType`
+strings — `oripa`, `mysteryBox`, `wallOfSleeves`, `slabLot`, `prizeWheel`, `kuji`, `razz`. A casual `"wall"`
+is rejected with a check-constraint error. (The app always passes the correct value; this only bites manual
+RPC pokes.)
+
+**Open / next:** unchanged — Sprint 7 is done and verified. Optional future polish remains un-started (board
+auto-expiry/cleanup cron, a "my live boards" list, richer razz single-winner semantics, an explicit
+first-subscribe catch-up read).

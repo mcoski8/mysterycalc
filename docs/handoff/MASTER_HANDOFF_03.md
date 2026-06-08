@@ -99,3 +99,29 @@ semantics; optional realtime catch-up read on first subscribe (currently relies 
   one-line eslint-disable, same as the `next-themes` mounted flag.
 - `display_config` (panels + title) rides in the same row as state, so phone toggles reach the iPad live.
 - Pre-existing `npm audit` items (postcss, vitest, breaking-change fixes) are unrelated — left alone.
+
+---
+
+## Session 10 — 2026-06-08 — Owner live walk-through (board verified on real devices)
+
+**What we accomplished:** closed Sprint 7's one open item — a real, owner-driven walk-through of the Live Game
+Board. Setup: the owner's **phone as the controller** + the **Mac mini's monitor as the customer display**
+(browser window standing in for the iPad — same role). The owner built a game on the phone, hit "Start live
+board," entered the pairing code on the monitor, and marked wins. **The full real-time loop (phone → Supabase →
+big screen) updated within ~a second with no refresh, and works really well (owner's words).** No UX rough edges
+surfaced on either screen. The board is now **owner-verified live**, not just plumbing-verified. No code written.
+
+**De-risk before the walk-through:** a fresh anon-key RPC round-trip against the *prod* Supabase confirmed the
+live path first — `create_live_game` → code + 36-char token; public read leaks no token/hash; secrets table →
+**401 denied**; update with a wrong token → **400 "invalid control token"**, right token → 204 + state persisted;
+`end_live_game` → 204; throwaway board cleaned up. `/board` serves 200 in prod.
+
+**Decided:** nothing new (DECISIONS_LOG unchanged through 039). This was verification only.
+
+**Open / next:** Sprint 7 fully done + verified. Optional future polish remains un-started: board
+auto-expiry/cleanup cron · a "my live boards" list on the controller · richer razz (single-winner) semantics ·
+an explicit first-subscribe catch-up read. No forced next task.
+
+**Landmine learned:** `live_games_game_type_chk` only accepts exact engine `GameType` strings
+(`oripa`/`mysteryBox`/`wallOfSleeves`/`slabLot`/`prizeWheel`/`kuji`/`razz`) — a casual `"wall"` is rejected.
+Only matters for manual RPC pokes; the app always sends the right value.
