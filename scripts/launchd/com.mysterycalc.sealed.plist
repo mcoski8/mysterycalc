@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mysterycalc.sealed</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/michaelchang/CODE/mysterycalc/scripts/daily_sealed.sh</string>
+    </array>
+
+    <!-- 07:50 local — after PokePrice's 07:30 tcgcsv mirror (and PokeHolder's 07:45), so we read the
+         freshest local file. Reads only the LOCAL mirror (no network to tcgcsv); if the mirror hasn't
+         run yet it uses the newest file on disk (at worst one day stale, self-healing). If the Mac is
+         asleep, launchd runs it at next wake. Install: copy to ~/Library/LaunchAgents/ then
+         `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.mysterycalc.sealed.plist`. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>50</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/michaelchang/pokeprice-data/mysterycalc-sealed.launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/michaelchang/pokeprice-data/mysterycalc-sealed.launchd.err.log</string>
+</dict>
+</plist>

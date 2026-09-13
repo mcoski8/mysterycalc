@@ -44,6 +44,18 @@ function loadEnvLocal(): void {
 }
 
 async function main() {
+  // Decision 040 (2026-09-12): PokePrice is the ONLY program allowed to fetch tcgcsv.com. The
+  // supported path is scripts/sync_sealed_from_mirror.py (reads PokePrice's local mirror). This
+  // direct-fetch script is kept only as the reference implementation and refuses to run unless
+  // you deliberately override it — never do that on a schedule.
+  if (process.env.ALLOW_DIRECT_TCGCSV !== "1") {
+    console.error(
+      "Refusing: direct tcgcsv.com fetches are retired (Decision 040).\n" +
+        "Use: /Users/michaelchang/CODE/pokeprice/pipeline/.venv/bin/python scripts/sync_sealed_from_mirror.py\n" +
+        "(override for a one-off only: ALLOW_DIRECT_TCGCSV=1)",
+    );
+    process.exit(1);
+  }
   loadEnvLocal();
 
   const args = process.argv.slice(2);

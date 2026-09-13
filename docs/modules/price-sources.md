@@ -25,7 +25,22 @@
   value (cost/quantity left to the vendor). Thumbnails use a host-agnostic `<img>` (Decision 030 — the image
   CDN migrates between `images.pokemontcg.io` and `images.scrydex.com`).
 
-## Sealed-product pricing via tcgcsv (✅ BUILT — Sprint 4.5, Decisions 031–032)
+## Sealed-product pricing — CURRENT (Decision 040, 2026-09-12): from PokePrice's LOCAL tcgcsv mirror
+
+**MysteryCalc never contacts tcgcsv.com.** PokePrice (CODE/pokeprice) is the owner's sole tcgcsv consumer; it
+mirrors the daily price archive and product metadata to `~/pokeprice-data/` on the Mac. MysteryCalc's
+`sealed_products` table is refreshed from those files by:
+- `scripts/sync_sealed_from_mirror.py` — same classification (Decision 032), same type labels, same best-price
+  rule as the retired sync; upserts on `product_id` via PostgREST (service role from `.env.local`).
+- `scripts/daily_sealed.sh` — wrapper; log at `~/pokeprice-data/mysterycalc-sealed.log`.
+- `scripts/launchd/com.mysterycalc.sealed.plist` — 07:50 daily (after PokePrice's 07:30 mirror).
+  Install: copy to `~/Library/LaunchAgents/` and `launchctl bootstrap gui/$(id -u) <plist>`.
+- Manual run: `/Users/michaelchang/CODE/pokeprice/pipeline/.venv/bin/python scripts/sync_sealed_from_mirror.py [--dry-run]`.
+- Known lag: product metadata is mirrored weekly (Sundays); prices daily. New sets' sealed rows appear the next Sunday.
+- Retired pieces (kept for reference only): `lib/sealed/sync.ts` (network path, unreachable except via
+  `ALLOW_DIRECT_TCGCSV=1` on `scripts/sync-sealed.ts`), `app/api/cron/sync-sealed` (now 410 Gone), `vercel.json` (deleted).
+
+## Sealed-product pricing via tcgcsv (✅ BUILT — Sprint 4.5, Decisions 031–032) — HISTORICAL; network path retired by Decision 040
 
 - **tcgcsv.com relays TCGPlayer's full catalog for free** (`https://tcgcsv.com/tcgplayer/3` = Pokémon;
   `/groups`, `/{group}/products`, `/{group}/prices`). Key-less, ~daily refresh, asks for a `User-Agent`.

@@ -1,6 +1,12 @@
 // ============================================================
 // Sealed-products sync — copy tcgcsv's sealed catalog into our table.
 //
+// RETIRED AS AN AUTOMATED PATH (Decision 040, 2026-09-12): nothing schedules
+// this any more. The nightly refresh is scripts/sync_sealed_from_mirror.py on
+// the owner's Mac, reading PokePrice's local tcgcsv mirror (PokePrice is the
+// sole tcgcsv consumer). This file stays as the reference for the row shape and
+// is reachable only from scripts/sync-sealed.ts behind an explicit override.
+//
 // Plain English: tcgcsv.com hands out TCGPlayer's whole catalog as bulk files,
 // not a search API. This job downloads those files, keeps only the SEALED
 // product that has a price (booster boxes, ETBs, packs, bundles…), and writes a

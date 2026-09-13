@@ -281,3 +281,27 @@
 **Options:** (a) Add a small client-side QR library (`qrcode.react`, MIT) | (b) Hit an external QR image service (e.g. `api.qrserver.com`) as an `<img src>` | (c) Hand-roll a QR encoder in `lib/`
 **Choice:** **(a) `qrcode.react@^4.2.0`** — renders the QR as inline SVG, entirely client-side, MIT-licensed, works offline. The QR only ever encodes the **public** display URL (`…/board/<code>`), never the control token, so it stays view-only by construction.
 **Why:** (b) leaks the (admittedly non-secret) URL to a third party on every render and breaks if that service is down or the venue WiFi is flaky; (c) is ~500 lines of error-prone Reed-Solomon/masking code for no benefit. A tiny, well-known SVG QR component is the right call and is squarely **in scope** for the already-approved Decision 038 feature (so no new scope). **Realized this session (Session 9):** the full Live Game Board app — pure logic in `lib/live-board/{types,state,odds,code,client}.ts`; UI in `components/live-board/{StartLiveBoard,BoardController,BoardDisplay,JoinBoardForm,WatchQR,AnimatedNumber}.tsx`; routes `app/board/page.tsx`, `app/board/[code]/page.tsx`, `app/board/[code]/control/page.tsx`; wired into `components/calculator/Calculator.tsx`; 18 tests in `tests/live-board.test.ts`. The Session-8 migration was **not** touched. Verified end-to-end against the remote project: token-checked RPC writes (wrong token rejected), public read leaks no secret, and Supabase Realtime delivers `postgres_changes` (INSERT/UPDATE/DELETE) — including with the `id=eq.<id>` filter. Gotcha logged: a sub-second window between `.subscribe()`→SUBSCRIBED and the binding going live can drop one update, which is harmless because the whole-state design re-syncs on the next event. Sprint 7 is now **complete.**
+
+## Decision 040 — Sealed prices come from PokePrice's LOCAL tcgcsv mirror; the Vercel cron that fetched tcgcsv.com is retired
+- **Date:** 2026-09-12 (Session 11 — a cross-project compliance fix found during the scan-saas sign-off audit)
+- **Question:** Decision 034 activated a nightly Vercel Cron (`/api/cron/sync-sealed`) that fetched tcgcsv.com
+  directly: 1 + 2×~217 ≈ 435 requests per night from Vercel cloud IPs, 6 in parallel. The owner's standing rule
+  (set 2026-08-06 after tcgcsv blocked PokePrice for over-fetching) is that **PokePrice is the ONLY program that
+  contacts tcgcsv.com**; every other project reads PokePrice's local mirror on the Mac. MysteryCalc was a second
+  automated consumer. How do we keep sealed prices fresh without touching tcgcsv?
+- **Choice:** The PokeHolder pattern. New `scripts/sync_sealed_from_mirror.py` (Python, runs in PokePrice's venv)
+  reads the newest `~/pokeprice-data/tcgcsv_archive/prices-YYYY-MM-DD.ppmd.7z` (Pokémon EN prices) + the
+  `~/pokeprice-data/tcgcsv_products/3/` product mirror, applies the SAME rules as the old sync (sealed = no
+  Number and no Rarity, Decision 032; same product-type regex table; best price = marketPrice > 0 preferring
+  Normal) and upserts `sealed_products` via PostgREST with the service role from `.env.local`. Scheduled by
+  launchd `com.mysterycalc.sealed` at 07:50 daily (after PokePrice's 07:30 mirror). `vercel.json` deleted (it held
+  only the cron); the route now returns **410 Gone** and imports nothing that fetches; `scripts/sync-sealed.ts`
+  refuses to run unless `ALLOW_DIRECT_TCGCSV=1`. Zero tcgcsv network from MysteryCalc, in any environment.
+- **Evidence:** dry run found **1,935** sealed products from the 2026-09-11 archive; the old cron's run this
+  morning (09:12 UTC) had written exactly **1,935** rows → parity. Real run wrote 1,935 rows; launchd shows
+  `com.mysterycalc.sealed` loaded (status 0); typecheck/lint/88 tests/build all pass.
+- **Trade-off:** product metadata is mirrored weekly (Sundays), so a set released mid-week gets its sealed rows
+  the following Sunday instead of the next night (prices are daily). The script logs such groups. If that lag ever
+  matters, the fix belongs in PokePrice (incremental daily products refresh), not here.
+- **Supersedes:** the cron activation in Decision 034 (the rest of 034 stands).
+

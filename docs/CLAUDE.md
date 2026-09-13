@@ -80,7 +80,7 @@ break-even indicator (proposed for v1). Detail lives in `docs/modules/calculatio
 - **Supabase (Postgres + Auth)** — login + saved games (Phase 2).
 - **Vercel** — hosting + deploy.
 - **Price lookup (Phase 4 — BUILT):** pokemontcg.io (singles, TCGPlayer market price) behind a pluggable
-  `PriceSource` interface; manual entry is the always-available fallback. Sealed via **tcgcsv** is adopted,
+  `PriceSource` interface; manual entry is the always-available fallback. Sealed via **tcgcsv** is adopted (read from **PokePrice's local mirror** since Decision 040 — MysteryCalc itself never fetches tcgcsv.com),
   built in its own sprint (Decision 031); graded (PSA/BGS) has no free source and stays manual.
 - **The calculation engine is pure, framework-free TypeScript** in `lib/` — no React, no DB. Most-tested,
   best-commented part of the codebase.

@@ -1,51 +1,28 @@
 // ============================================================
-// GET /api/cron/sync-sealed — the nightly sealed-price refresh.
+// GET /api/cron/sync-sealed — RETIRED (Decision 040, 2026-09-12).
 //
-// Plain English: once a day, Vercel calls this URL on a schedule (set in
-// vercel.json). It re-syncs sealed product from tcgcsv — refreshing prices AND
-// picking up any newly released boxes/ETBs — so the values the app auto-fills
-// stay current with zero effort from anyone. The whole sync takes ~5s, well
-// inside Vercel's time limit, so it does the full job (no split needed).
-//
-// SECURITY: this endpoint WRITES the database, so it must not be open to the
-// public. It only runs when the caller proves it's our cron by sending the
-// secret in `Authorization: Bearer <CRON_SECRET>`. Vercel adds this header
-// automatically for scheduled crons when CRON_SECRET is set in the project's
-// env vars; a manual run must send it by hand. No secret set → we refuse.
+// Plain English: this endpoint used to be called by a nightly Vercel Cron and
+// fetched tcgcsv.com directly (~435 requests a night from cloud servers).
+// tcgcsv is a one-person hobby mirror and the owner's rule is that PokePrice is
+// the ONLY program that talks to it. Sealed prices are now refreshed by a job on
+// the owner's Mac that reads PokePrice's local mirror:
+//   scripts/sync_sealed_from_mirror.py  (launchd: com.mysterycalc.sealed, 07:50)
+// The cron entry was removed from vercel.json. This stub stays so a stale link
+// or a manual call gets a clear answer instead of a 404 — and can never reach
+// tcgcsv.com again. WARNING: do not re-add a direct tcgcsv fetch here.
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { syncSealed } from "@/lib/sealed/sync";
 
-// Module state + outbound fetches need the Node runtime; never static.
-export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Cap the run so a stuck upstream can't hang the function. 60s is the Hobby
-// ceiling; the full sync fits comfortably (it measured ~5s).
-export const maxDuration = 60;
 
-export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  // Fail closed: if no secret is configured, the endpoint is disabled entirely.
-  if (!secret) {
-    return NextResponse.json(
-      { ok: false, error: "Sync endpoint disabled — CRON_SECRET is not set." },
-      { status: 503 },
-    );
-  }
-  // Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`. Reject anything else.
-  const auth = request.headers.get("authorization");
-  if (auth !== `Bearer ${secret}`) {
-    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
-  }
-
-  try {
-    const stats = await syncSealed();
-    return NextResponse.json({ ok: true, ...stats });
-  } catch (err) {
-    return NextResponse.json(
-      { ok: false, error: (err as Error).message ?? "Sync failed." },
-      { status: 500 },
-    );
-  }
+export async function GET() {
+  return NextResponse.json(
+    {
+      ok: false,
+      error:
+        "Retired (Decision 040): sealed prices are synced on the owner's Mac from PokePrice's local tcgcsv mirror. This endpoint no longer contacts tcgcsv.com.",
+    },
+    { status: 410 },
+  );
 }

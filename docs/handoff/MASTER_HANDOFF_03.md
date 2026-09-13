@@ -125,3 +125,24 @@ an explicit first-subscribe catch-up read. No forced next task.
 **Landmine learned:** `live_games_game_type_chk` only accepts exact engine `GameType` strings
 (`oripa`/`mysteryBox`/`wallOfSleeves`/`slabLot`/`prizeWheel`/`kuji`/`razz`) — a casual `"wall"` is rejected.
 Only matters for manual RPC pokes; the app always sends the right value.
+
+## Session 11 — 2026-09-12 — tcgcsv compliance fix (Decision 040)
+
+**Why this session happened:** while signing off the new scan-saas project, an audit of every program that touches
+tcgcsv.com found MysteryCalc's nightly Vercel cron still fetching it directly (~435 requests/night, cloud IPs).
+Owner: "fix now, pause sign-off."
+
+**What changed**
+- Added `scripts/sync_sealed_from_mirror.py` (Mac-local, reads PokePrice's mirror; same rules as the old sync),
+  `scripts/daily_sealed.sh`, `scripts/launchd/com.mysterycalc.sealed.plist` (07:50 daily; loaded).
+- Deleted `vercel.json`; `/api/cron/sync-sealed` → 410 Gone with no fetch path; `scripts/sync-sealed.ts` refuses
+  without `ALLOW_DIRECT_TCGCSV=1`; `lib/sealed/sync.ts` header marks it retired.
+- Docs: Decision 040, CURRENT_PHASE, `modules/price-sources.md`, CLAUDE.md one-liner.
+
+**Evidence:** dry run 1,935 == old cron's 1,935 rows today; real run wrote 1,935; `launchctl list` shows the job;
+typecheck + lint + 88 tests + `next build` pass.
+
+**Open / next:** after the Vercel deploy, confirm `GET /api/cron/sync-sealed` returns 410 (done in-session if the
+deploy finished). If a brand-new set's sealed product must appear mid-week, ask PokePrice for a daily incremental
+products refresh — do NOT re-add a tcgcsv fetch here.
+

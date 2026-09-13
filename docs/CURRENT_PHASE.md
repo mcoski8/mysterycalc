@@ -1,6 +1,6 @@
 # Current: Live Game Board — ✅ COMPLETE & OWNER-VERIFIED LIVE.
 
-> Updated: 2026-06-08 (end of Session 10)
+> Updated: 2026-09-12 (end of Session 11 — tcgcsv compliance fix; see Decision 040)
 > Status: **MysteryCalc is LIVE at https://mysterycalc.vercel.app** (Vercel Hobby/free) — all 5 phases shipped,
 > plus the post-launch Sprint 6 UX overhaul and **Sprint 7 — the Live Game Board** (customer-facing iPad
 > scoreboard, controlled from the vendor's phone, real-time via Supabase). As of Session 10 the board is
@@ -20,7 +20,21 @@ profit three ways, hit rate, prize-tier breakdown, break-even. Log in to save ga
 sheet, look up a card/sealed product's market value, and **run the game live** as a customer-facing iPad
 scoreboard. Stack: Next.js 16 + Supabase + Vercel. **Live.**
 
-## What happened this session (Session 10)
+## What happened this session (Session 11 — 2026-09-12)
+
+**tcgcsv compliance fix (Decision 040).** An audit run during the scan-saas project's sign-off found MysteryCalc's
+nightly Vercel cron still fetching tcgcsv.com directly (~435 requests/night from cloud IPs) — a violation of the
+owner's rule that PokePrice is the sole tcgcsv consumer. Fixed the same day:
+- **New:** `scripts/sync_sealed_from_mirror.py` + `scripts/daily_sealed.sh` + `scripts/launchd/com.mysterycalc.sealed.plist`
+  — a Mac-local job (07:50 daily, loaded) that rebuilds `sealed_products` from PokePrice's local mirror. Parity
+  proven: 1,935 rows from the mirror == 1,935 rows the old cron wrote this morning. Real run wrote 1,935.
+- **Retired:** `vercel.json` (cron) deleted; `/api/cron/sync-sealed` now answers 410 Gone and fetches nothing;
+  `scripts/sync-sealed.ts` refuses without an explicit override. No code path in MysteryCalc can reach tcgcsv.com.
+- **Deploy:** pushed to main → Vercel auto-deploy drops the cron. Verify after deploy: the route returns 410.
+- **Operational:** the job lives on this Mac like PokeHolder's; if the Mac is off at 07:50 launchd runs it at
+  next wake (worst case one day stale). Log: `~/pokeprice-data/mysterycalc-sealed.log`.
+
+## What happened in Session 10
 
 **Owner live walk-through of the Live Game Board — the one open Sprint-7 item, now closed.** No code written;
 this was verification + clean shutdown.
